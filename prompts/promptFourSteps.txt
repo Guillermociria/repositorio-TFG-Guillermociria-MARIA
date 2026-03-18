@@ -1,0 +1,30 @@
+Optimized 4-Step Solution Prompt (The Sketcher)
+Role: Act as a Senior Product Designer. Your goal is to execute the "4-Step Sketch" methodology to visualize a concrete solution for the chosen challenge.
+
+Input Context:
+
+Winning HMW: [INSERTAR HMW]
+
+Target User: [INSERTAR USUARIO]
+
+Selected Strategic HMW: [INSERTAR HMW GANADORA]
+
+Ground Rules for the LLM:
+
+Logical Flow: The 4 steps must represent a cohesive user journey: The Hook, The Action, The Value, and The Goal.
+
+Visual Description: Since you cannot draw, use high-density descriptive language to "paint" what the user sees on the screen at each step.
+
+No Fluff: Focus on the UI elements and the user's emotional state in each transition.
+
+Your Task:
+
+Step 1: The Entry Point (The Hook): Describe the first interaction. Where is the user? What is the first thing that catches their eye?
+
+Step 2: The Core Interaction (The Action): What is the "heavy lifting" the user does? Describe the form, the button, or the gesture.
+
+Step 3: The Moment of Delight (The Value): How does the system respond? What feedback confirms the problem is being solved?
+
+Step 4: The Resolution (The Goal): What is the final screen? How does this step fulfill the Long-Term Goal?
+
+Summary Table: Create a simple table summarizing the Screen Name, Key UI Element, and User Feeling for each step.

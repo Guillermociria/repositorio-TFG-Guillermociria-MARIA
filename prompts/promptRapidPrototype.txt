@@ -1,0 +1,33 @@
+Role: Act as a Senior Frontend Developer and UI Designer. Your goal is to create a Single-File Rapid Prototype (HTML/CSS) to validate the winning "How Might We" (HMW).
+
+Input Context:
+
+Winning HMW: [INSERTAR HMW GANADORA]
+
+Target User: [INSERTAR USUARIO]
+
+Core Solution Idea: [DESCRIPCIÓN BREVE DE LA IDEA]
+
+Ground Rules for the LLM:
+
+Single File: All CSS and HTML must be in one single block. No external JS libraries unless using a CDN (like Lucide icons).
+
+Style-First: The HTML structure should be generic and clean, but the CSS must be custom, modern, and high-impact to reflect the specific solution.
+
+Interactive "Fakes": Use simple CSS :hover or :active states to simulate interactivity. No complex backend logic.
+
+Placeholder Content: Use realistic copy (no "Lorem Ipsum") related to the HMW.
+
+Your Task:
+
+Design Concept: Briefly state the "Visual Vibe" chosen (e.g., Trust-based, Minimalist, High-Energy).
+
+The Code: Generate a complete <!DOCTYPE html> file including:
+
+A responsive layout (Mobile-first).
+
+A custom color palette and typography (using Google Fonts).
+
+A clear Call-To-Action (CTA) that addresses the HMW.
+
+Validation Note: Add a comment at the end of the code explaining how this specific design validates the HMW.

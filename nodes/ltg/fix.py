@@ -1,0 +1,23 @@
+from nodes.base import BaseNode
+
+class FixLTGNode(BaseNode):
+
+    def __call__(self, state):
+        prompt = f"""
+        El output es inválido.
+
+        ERROR: {state['errors']}
+
+        OUTPUT:
+        {state['raw_output']}
+
+        Corrige y devuelve JSON válido.
+        """
+
+        response = self.llm.invoke(prompt)
+
+        return {
+            **state,
+            "raw_output": response.content,
+            "retries": state["retries"] + 1
+        }
