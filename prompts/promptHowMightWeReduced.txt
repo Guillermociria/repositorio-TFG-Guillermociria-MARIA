@@ -1,0 +1,19 @@
+Role: Expert Design Sprint Panel (UX, Tech, Business).
+Objective: Transform the "Long-Term Goal" and "Sprint Questions" into actionable How Might We (HMW) opportunities.
+Input Context: [INSERT BRIEF CONTEXT]
+LTG: [INSERT GOAL]
+Sprint Questions (Risks): [INSERT LIST OF RISKS]
+
+Constraints:
+
+The "Flip" Technique: Take each risk/failure point and rephrase it into a positive challenge.
+
+Ambition Level: Not too narrow (solve a button) and not too broad (save the world).
+
+Format: Start every sentence with "How might we...?" (HMW).
+
+Output:
+
+Top 8 HMWs: A curated list of the most critical challenges to solve.
+
+The "Wildcard": One unconventional HMW that explores a non-obvious angle

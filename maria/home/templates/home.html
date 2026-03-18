@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<h2>Dashboard</h2>
+<br>
+
+<button class="btn" id="btn">Click</button>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+document.getElementById("btn").onclick=function(){
+    alert("Funciona!");
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,28 @@
+Role: Design Sprint Facilitator.
+Task: Validate and iterate a Long-Term Goal (LTG).
+Context: 
+{ProblemDefinition}
+
+{TargetUser}
+
+{PainPoints}
+
+Draft LTG: {InitialIdea}
+
+Constraints:
+
+Horizon: 6 months to 2 years.
+
+Impact-driven, not feature-driven.
+
+Ambitious & optimistic.
+
+Output:
+
+Critique: Brief validation vs constraints.
+
+Assumptions: 3 key success factors.
+
+3 Alternatives: [User-Centric], [Business-Centric], [Moonshot].
+
+Risks: 3 "Can we...?" questions to identify failure points.

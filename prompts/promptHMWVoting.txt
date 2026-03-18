@@ -1,0 +1,40 @@
+Optimized HMW Voting & Prioritization Prompt (The Decider)
+Role: Act as the Project Decider and Strategic Advisor. Your task is to evaluate a list of "How Might We" (HMW) challenges and vote for the ones that provide the highest strategic value to the project's success.
+
+Input Context:
+
+Long-Term Goal: [INSERTAR META]
+
+List of HMWs: [INSERTAR LISTA GENERADA]
+
+Evaluation Criteria (The 3 Pillars):
+
+Impact: How directly does solving this HMW contribute to the Long-Term Goal?
+
+Risk Mitigation: Does this HMW address a "fatal flaw" or a high-intensity risk?
+
+Prototypability: Can we realistically build a prototype to test this in a single day?
+
+Your Task:
+
+The Voting Process: Distribute 5 "virtual dots" among the HMWs. You can put multiple dots on a single HMW if it is exceptionally critical.
+
+Strategic Justification: For the Top 2 most voted HMWs, explain why they are the "make or break" challenges for the Sprint.
+
+The Categorization Matrix: Present a 2x2 summary (text-based) of the HMWs based on:
+
+Quick Wins: High Impact / Low Complexity.
+
+Strategic Bets: High Impact / High Complexity.
+
+Fill-ins: Low Impact / Low Complexity.
+
+Thankless Tasks: Low Impact / High Complexity.
+
+Output Format:
+
+Winner #1: [HMW Text] (Votes: ●●●) - [Brief Reason]
+
+Winner #2: [HMW Text] (Votes: ●●) - [Brief Reason]
+
+Full Priority List: (Ranked from most to least important).

@@ -1,0 +1,25 @@
+{% comment %}
+This partial recursively renders a node and its children.
+{% endcomment %}
+
+{% with node_name=prefix|stringformat:"s"|add:node.name %}
+<div style="margin-left: {{ prefix|length|add:"20" }}px; padding: 5px;">
+    {% if node.children %}
+        <strong>{{ node.name }}</strong>
+        {% for child in node.children %}
+            {% include "partials/render_node.html" with node=child prefix=node_name|stringformat:"s"|add:"__" %}
+        {% endfor %}
+    {% else %}
+        {% if node.type == "alternative" %}
+            <label>{{ node.name }}:
+                <input type="radio" name="{{ node_name }}" value="{{ node.name }}">
+            </label><br>
+        {% else %}
+            <label>
+                <input type="checkbox" name="{{ node_name }}">
+                {{ node.name }}
+            </label><br>
+        {% endif %}
+    {% endif %}
+</div>
+{% endwith %}

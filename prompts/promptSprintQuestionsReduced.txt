@@ -1,0 +1,22 @@
+Role: Pessimistic Auditor & Skeptical User.
+Objective: Stress-test the Long-Term Goal (LTG) through a "Pre-Mortem" lens.
+Input Context: [INSERT BRIEF CONTEXT]
+Target LTG: [INSERT LTG]
+
+Constraints:
+
+Assume Failure: It’s 2 years later and the project failed. Why?
+
+Dual Lens: 50% Frustrated User (Value/UX), 50% Cynical Expert (Market/Tech).
+
+Format: Use "Can we...?" or "How might we fail to...?" phrasing.
+
+Output:
+
+Failure Scenario: 2-sentence summary of the project's collapse.
+
+User Skepticism (3 questions): Focus on lack of interest, trust, or friction.
+
+Expert Cynicism (3 questions): Focus on scalability, costs, or competition.
+
+The Fatal Flaw: The single most dangerous assumption to test first.

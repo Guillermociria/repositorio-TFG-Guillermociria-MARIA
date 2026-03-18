@@ -1,0 +1,180 @@
+{
+  "featureModel": {
+    "name": "EmpatiaJerarquica",
+    "root": {
+      "name": "FaseEmpatia",
+      "type": "mandatory",
+      "children": [
+        {
+          "name": "CategoriasDeInformacion",
+          "type": "or",
+          "children": [
+            {
+              "name": "Usuario",
+              "type": "or",
+              "children": [
+                {
+                  "name": "MetodoDefinirUsu",
+                  "type": "optional",
+                  "children": [{ "name": "UsuariosExtremos" }]
+                },
+                {
+                  "name": "MetodoClasificarUsu",
+                  "type": "alternative",
+                  "children": [
+                    { "name": "GrupoFocal" },
+                    { "name": "ApuntesPOEMS" }
+                  ]
+                },
+                {
+                  "name": "MetodoContextualizarUsu",
+                  "type": "alternative",
+                  "children": [
+                    { "name": "EntrevistasCualitativas" },
+                    { "name": "LienzoDePropuestaDeValor" }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "ActividadesDelUsuario",
+              "type": "or",
+              "children": [
+                {
+                  "name": "MetodoDefinirAct",
+                  "type": "optional",
+                  "children": [{ "name": "CincoParaQue" }]
+                },
+                {
+                  "name": "MetodoCompararAct",
+                  "type": "optional",
+                  "children": [{ "name": "Safari" }]
+                },
+                {
+                  "name": "MetodoClasificarAct",
+                  "type": "alternative",
+                  "children": [
+                    { "name": "QueComoPorque" },
+                    { "name": "SeisSombreros" }
+                  ]
+                },
+                {
+                  "name": "MetodoContextualizarAct",
+                  "type": "alternative",
+                  "children": [
+                    { "name": "CasosDeUso" },
+                    { "name": "ObservacionEncubierta" },
+                    { "name": "MapaDeInteraccionDeUsuarios" }
+                  ]
+                },
+                {
+                  "name": "MetodoEvolucionAct",
+                  "type": "optional",
+                  "children": [{ "name": "StartStopContinue" }]
+                }
+              ]
+            },
+            {
+              "name": "ArtefactoSoporte",
+              "type": "or",
+              "children": [
+                {
+                  "name": "MetodoCompararArt",
+                  "type": "alternative",
+                  "children": [
+                    { "name": "InvestigacionDeReferentes" },
+                    { "name": "BenchmarkAnalisisComparativo" }
+                  ]
+                },
+                {
+                  "name": "MetodoContextualizarArt",
+                  "type": "optional",
+                  "children": [{ "name": "LienzoDeModeloDeNegocio" }]
+                }
+              ]
+            },
+            {
+              "name": "ProductoEntradaSalida",
+              "type": "or",
+              "children": [
+                {
+                  "name": "MetodoDefinirPro",
+                  "type": "optional",
+                  "children": [{ "name": "GuionDeEntrevistaCualitativa" }]
+                },
+                {
+                  "name": "MetodoCompararPro",
+                  "type": "optional",
+                  "children": [{ "name": "SeriaNoSeria" }]
+                },
+                {
+                  "name": "MetodoClasificarPro",
+                  "type": "alternative",
+                  "children": [
+                    { "name": "SeleccionPorClasificacion" },
+                    { "name": "DentroFuera" },
+                    { "name": "TarjetasRojasYVerdes" }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "InformacionDelProblema",
+              "type": "or",
+              "children": [
+                {
+                  "name": "MetodoDefinirInf",
+                  "type": "alternative",
+                  "children": [
+                    { "name": "CincoPorques" },
+                    { "name": "AnalisisDimensional" },
+                    { "name": "AnalisisPESTAL" }
+                  ]
+                },
+                {
+                  "name": "MetodoCompararInf",
+                  "type": "optional",
+                  "children": [{ "name": "AnalisisDeCompetencias" }]
+                },
+                {
+                  "name": "MetodoClasificarInf",
+                  "type": "alternative",
+                  "children": [
+                    { "name": "MatrizDAFO" },
+                    { "name": "EntrevistasAExpertos" },
+                    { "name": "Philips6_6" }
+                  ]
+                },
+                {
+                  "name": "MetodoContextualizarInf",
+                  "type": "alternative",
+                  "children": [
+                    { "name": "MapaDeActores" },
+                    { "name": "DibujoDelProblema" },
+                    { "name": "MapaDelContexto" },
+                    { "name": "FlorDeLoto" }
+                  ]
+                },
+                {
+                  "name": "MetodoEvolucionInf",
+                  "type": "alternative",
+                  "children": [
+                    { "name": "MatrizDeTendencias" },
+                    { "name": "MapaDelPresenteFuturo" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "constraints": [
+        {
+          "type": "requires",
+          "from": "EntrevistasCualitativas",
+          "to": "GuionDeEntrevistaCualitativa"
+        }
+      ]
+    }
+  }
+}

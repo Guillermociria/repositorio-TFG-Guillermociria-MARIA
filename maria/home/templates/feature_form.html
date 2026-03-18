@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<h1>Selecciona opciones</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    {% comment %}
+    Recursive rendering of the feature tree using Django template loops.
+    {% endcomment %}
+
+    {% include "partials/render_node.html" with node=feature_root prefix="" %}
+
+    <button type="submit">Enviar</button>
+</form>
+
+{% if response %}
+<h2>Datos enviados:</h2>
+<pre>{{ response }}</pre>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,184 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<title>{% block title %}Mi Plataforma{% endblock %}</title>
+
+<style>
+
+:root{
+    --primary:#853953;
+    --secondary:#F3F4F4;
+    --tertiary:#612D53;
+    --dark:#2C2C2C;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI, Arial, sans-serif;
+}
+
+body{
+    background:var(--secondary);
+}
+
+/* LAYOUT */
+
+.layout{
+    display:grid;
+    grid-template-columns:240px 1fr;
+    grid-template-rows:65px 1fr;
+    grid-template-areas:
+        "sidebar header"
+        "sidebar content";
+    height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    grid-area:sidebar;
+    background:var(--tertiary);
+    padding:25px 15px;
+    color:white;
+}
+
+.sidebar h2{
+    margin-bottom:25px;
+    font-size:20px;
+}
+
+.nav-item{
+    display:block;
+    padding:12px 15px;
+    margin-bottom:8px;
+    border-radius:6px;
+    text-decoration:none;
+    color:white;
+    transition:0.2s;
+    font-weight:500;
+}
+
+.nav-item:hover{
+    background:var(--primary);
+}
+
+/* HEADER */
+
+header{
+    grid-area:header;
+    background:white;
+    border-bottom:1px solid #ddd;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 30px;
+}
+
+header h1{
+    font-size:22px;
+    color:var(--dark);
+}
+
+.header-links a{
+    margin-left:20px;
+    text-decoration:none;
+    color:var(--dark);
+    font-weight:500;
+}
+
+.header-links a:hover{
+    color:var(--primary);
+}
+
+/* CONTENT */
+
+main{
+    grid-area:content;
+    padding:35px;
+}
+
+.content-box{
+    background:white;
+    border-radius:8px;
+    padding:30px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* BOTONES */
+
+.btn{
+    background:var(--primary);
+    border:none;
+    color:white;
+    padding:10px 18px;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:500;
+}
+
+.btn:hover{
+    background:var(--tertiary);
+}
+
+</style>
+
+{% block extra_css %}{% endblock %}
+
+</head>
+
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+<h2>Secciones</h2>
+
+<a class="nav-item" href="/">Inicio</a>
+<a class="nav-item" href="/dashboard">Dashboard</a>
+<a class="nav-item" href="/analisis">Análisis</a>
+<a class="nav-item" href="/reportes">Reportes</a>
+
+</aside>
+
+
+<!-- HEADER -->
+
+<header>
+
+<h1>Mi Plataforma</h1>
+
+<div class="header-links">
+<a href="/">Home</a>
+<a href="/feature-form">Formulario</a>
+</div>
+
+</header>
+
+
+<!-- CONTENIDO -->
+
+<main>
+
+<div class="content-box">
+
+{% block content %}
+{% endblock %}
+
+</div>
+
+</main>
+
+</div>
+
+{% block scripts %}{% endblock %}
+
+</body>
+</html>
