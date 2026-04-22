@@ -20,3 +20,5 @@ User Skepticism (3 questions): Focus on lack of interest, trust, or friction.
 Expert Cynicism (3 questions): Focus on scalability, costs, or competition.
 
 The Fatal Flaw: The single most dangerous assumption to test first.
+
+Make sure to return all in english

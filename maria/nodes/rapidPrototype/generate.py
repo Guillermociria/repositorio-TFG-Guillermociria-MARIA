@@ -1,7 +1,8 @@
 from nodes.base import BaseNode
 from utils.prompt_loader import load_prompt
 
-class GenerateLTGNode(BaseNode):
+
+class GenerateRPGNode(BaseNode):
 
     def __init__(self, llm, prompt_path):
         super().__init__(llm)

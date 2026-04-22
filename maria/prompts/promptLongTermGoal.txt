@@ -33,3 +33,8 @@ Business-Centric Version: Focused on market position, growth, or competitive adv
 Disruptive/Moonshot Version: A version that significantly raises the ambition of the project.
 
 Sprint Questions: Generate 2-3 "How might we fail?" or "Can we...?" questions to help the team identify potential obstacles to this goal.
+
+OUTPUT FORMAT: Return ONLY raw, valid JSON. No markdown tags (like ```json) or conversational text. You MUST use EXACTLY these keys:
+{{"critique": "string", "assumptions": ["string"], "alternatives": {{"user_centric": "string", "business_centric": "string", "moonshot": "string"}}, "risks": ["string"]}}
+
+Make sure to return all in english

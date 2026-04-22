@@ -28,3 +28,5 @@ Step 3: The Moment of Delight (The Value): How does the system respond? What fee
 Step 4: The Resolution (The Goal): What is the final screen? How does this step fulfill the Long-Term Goal?
 
 Summary Table: Create a simple table summarizing the Screen Name, Key UI Element, and User Feeling for each step.
+
+Make sure to return all in english

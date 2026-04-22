@@ -23,3 +23,5 @@ Risk Intensity Mapping: For each question, assign an Intensity Level [Low | Medi
 Redundancy Cleanup: Merge similar doubts into a single, powerful "Mega-Question."
 
 The "Blind Spot": Identify one critical risk the team has completely overlooked based on the Long-Term Goal provided.
+
+Make sure to return all in english
