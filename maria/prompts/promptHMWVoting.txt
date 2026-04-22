@@ -38,3 +38,5 @@ Winner #1: [HMW Text] (Votes: ●●●) - [Brief Reason]
 Winner #2: [HMW Text] (Votes: ●●) - [Brief Reason]
 
 Full Priority List: (Ranked from most to least important).
+
+Make sure to return all in english

@@ -26,3 +26,8 @@ Assumptions: 3 key success factors.
 3 Alternatives: [User-Centric], [Business-Centric], [Moonshot].
 
 Risks: 3 "Can we...?" questions to identify failure points.
+
+OUTPUT FORMAT: Return ONLY raw, valid JSON. No markdown tags (like ```json) or conversational text. You MUST use EXACTLY these keys:
+{{"critique": "string", "assumptions": ["string"], "alternatives": {{"user_centric": "string", "business_centric": "string", "moonshot": "string"}}, "risks": ["string"]}}
+
+Make sure to return all in english

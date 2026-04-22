@@ -1,8 +1,11 @@
+import time
 from nodes.base import BaseNode
 
-class FixLTGNode(BaseNode):
+class FixSQNode(BaseNode):
 
     def __call__(self, state):
+        print("Pausando 3 segundos para no saturar la API...")
+        time.sleep(3)
         prompt = f"""
         El output es inválido.
 

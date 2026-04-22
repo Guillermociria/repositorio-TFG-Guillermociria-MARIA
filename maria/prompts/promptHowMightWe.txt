@@ -23,3 +23,5 @@ Risk Mitigation: Take the 3 most critical "Sprint Questions" (the pessimistic on
 Categorized Output: Present the HMWs in a list, labeling each as either [Experience] (User-focused), [Feasibility] (Technical-focused), or [Viability] (Business-focused).
 
 The Wildcard: Generate one "Moonshot HMW" that suggests a radical or non-obvious way to solve the problem.
+
+Make sure to return all in english

@@ -17,3 +17,5 @@ Output:
 Top 8 HMWs: A curated list of the most critical challenges to solve.
 
 The "Wildcard": One unconventional HMW that explores a non-obvious angle
+
+Make sure to return all in english

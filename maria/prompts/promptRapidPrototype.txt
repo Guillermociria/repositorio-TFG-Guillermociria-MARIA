@@ -31,3 +31,5 @@ A custom color palette and typography (using Google Fonts).
 A clear Call-To-Action (CTA) that addresses the HMW.
 
 Validation Note: Add a comment at the end of the code explaining how this specific design validates the HMW.
+
+Make sure to return all in english
