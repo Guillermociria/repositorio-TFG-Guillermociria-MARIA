@@ -27,4 +27,4 @@ The Fatal Flaw: Identify the one single assumption that, if proven wrong, kills 
 Make sure to return all in english
 
 OUTPUT FORMAT: Return ONLY raw, valid JSON. No markdown tags (like ```json) or conversational text. You MUST use EXACTLY these keys:
-{ "pre_mortem_analysis": "string", "skeptical_user_questions": ["string"], "cynical_expert_questions": ["string"], "fatal_flaw_assumption": "string"}
+{{ "pre_mortem_analysis": "string", "skeptical_user_questions": ["string"], "cynical_expert_questions": ["string"], "fatal_flaw_assumption": "string"}}

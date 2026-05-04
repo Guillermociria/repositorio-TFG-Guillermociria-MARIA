@@ -1,6 +1,6 @@
 import json
 
-class ValidateSQNode:
+class ValidateMNode:
 
     def __call__(self, state):
         try:
@@ -13,7 +13,7 @@ class ValidateSQNode:
         # Esto nos protege si el LLM devuelve "Critique", "CRITIQUE" o "critique"
         data_lower_keys = {k.lower(): v for k, v in data.items()}
 
-        required = ["pre_mortem_analysis", "skeptical_user_questions", "cynical_expert_questions", "fatal_flaw_assumption"]
+        required = ["persona_summary", "discovery_phase_actions", "onboarding_phase_actions", "core_interaction_actions", "retention_phase_actions", "critical_friction_point"]
 
         # 3. Validamos sobre el diccionario en minúsculas
         for key in required:
@@ -28,5 +28,5 @@ class ValidateSQNode:
         return {
             **state,
             "validated": True,
-            "final_sq": data_lower_keys
+            "map_schema": data_lower_keys
         }

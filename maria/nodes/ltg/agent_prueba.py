@@ -3,6 +3,8 @@ import os
 import json
 from datetime import datetime
 
+from dotenv import load_dotenv
+load_dotenv()
 ruta_raiz = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(ruta_raiz)
 
@@ -17,7 +19,7 @@ from subnodes.fix import FixLTGNode
 
 
 # Configura tu API Key
-os.environ["GOOGLE_API_KEY"] = "AIzaSyAosE9Wi98BpEf5TVi7zGyOG5WLWx0hUGc"
+os.environ["GOOGLE_API_KEY"] = os.getenv("GEMINI_API_KEY")
 
 memory = MemorySaver()
 

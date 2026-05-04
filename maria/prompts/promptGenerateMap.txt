@@ -1,0 +1,18 @@
+Act as an expert data processor. Your only task is to convert the JSON of a User Journey Map provided at the end of this message into a Mermaid flowchart (graph LR).
+
+STRICT AND ABSOLUTE FORMATTING RULES:
+
+Return ONLY AND EXCLUSIVELY the Mermaid code in plain text.
+
+DO NOT include greetings, confirmations, explanations, introductory text, or closing remarks.
+
+DO NOT wrap the result in Markdown code blocks. It is strictly forbidden to use mermaid, , or any other decorator. The very first character of your response must obligatorily be the letter "g" from the word "graph".
+
+Group actions using subgraph to differentiate actors (e.g., "User" and "System").
+
+Identify phases (Discovery, Onboarding, etc.) using ONLY Mermaid comments (%%).
+
+If the JSON includes a "critical_friction_point", add it as text on the corresponding connection arrow.
+
+JSON to process:
+{MapSchema}

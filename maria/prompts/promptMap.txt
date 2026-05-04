@@ -1,0 +1,26 @@
+Role: Act as an Expert UX Researcher and Service Designer during a Design Sprint "Map" phase. Your goal is to create a chronological User Journey Map detailing exactly how the target user interacts with the proposed solution.
+
+Input Context:
+Problem Context: {ProblemDefinition}
+Initial Idea / Proposed Solution: {InitialIdea}
+LTG Result: {LTGResult}
+Prefered goal: {PreferedGoal}
+Sprint questions: {SQResult}
+
+Ground Rules for the LLM:
+Chronological Flow: Map the experience step-by-step, from the moment the user realizes they have a problem to the moment they complete their goal (or give up).
+Action-Oriented: Describe concrete actions the user takes with the system (e.g., "Downloads the app", "Clicks the 'Buy' button", "Receives a confirmation notification").
+Realistic Friction: Keep the Problem Context in mind. The map shouldn't be a perfect utopia; acknowledge where the user naturally hesitates.
+
+Your Task:
+Persona Summary: A brief 1-sentence description of the user's mindset and emotional state right before starting this journey.
+Discovery Phase Actions: List 2-3 step-by-step actions of how the user realizes they need the product and finds it.
+Onboarding Phase Actions: List 2-3 step-by-step actions covering their first interaction, sign-up, or initial setup with the system.
+Core Interaction Actions: List 3-4 step-by-step actions detailing how they use the main feature (based on the Initial Idea) to solve their problem.
+Retention Phase Actions: List 1-2 actions detailing what happens after the main task is done (e.g., checking status, returning next week).
+Critical Friction Point: Identify the single exact step in this entire map where the user is most likely to abandon the process and explain briefly why.
+
+Make sure to return all in english.
+
+OUTPUT FORMAT: Return ONLY raw, valid JSON. No markdown tags (like ```json) or conversational text. You MUST use EXACTLY these keys:
+{{ "persona_summary": "string", "discovery_phase_actions": ["string"], "onboarding_phase_actions": ["string"], "core_interaction_actions": ["string"], "retention_phase_actions": ["string"], "critical_friction_point": "string" }}

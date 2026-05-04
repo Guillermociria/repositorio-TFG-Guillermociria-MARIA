@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Design Sprint - Agente{% endblock %}
+
+{% block content %}
+<div class="sprint-container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <h2>Design Sprint con IA</h2>
+    <p>Completa estos datos para que el agente inicie el análisis del Design Sprint.</p>
+    <br>
+
+    <!-- FORMULARIO 1: INICIO DEL SPRINT -->
+    <form method="POST" id="sprint-form">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 15px;">
+            <h3>1. Definición del Problema</h3>
+            <textarea name="problema" rows="3" style="width: 100%;" placeholder="Describe el problema principal que quieres resolver..." required></textarea>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <h3>2. Público Objetivo (Usuario)</h3>
+            <input type="text" name="usuario" style="width: 100%; padding: 8px;" placeholder="Ej: Jóvenes de 18 a 25 años que estudian en la universidad..." required>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <h3>3. Puntos de Dolor (Pain Points)</h3>
+            <textarea name="dolores" rows="3" style="width: 100%;" placeholder="¿Qué le frustra o le duele al usuario actualmente con este problema?"></textarea>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <h3>4. Idea Inicial</h3>
+            <textarea name="idea" rows="3" style="width: 100%;" placeholder="¿Tienes alguna idea inicial de cómo solucionarlo? (Opcional)"></textarea>
+        </div>
+
+        <button type="submit" class="btn" style="padding: 10px 20px; font-size: 16px;">Iniciar Sprint</button>
+    </form>
+
+    <hr style="margin: 40px 0; border: 1px solid #ccc;">
+
+    <!-- FORMULARIO 2: SECCIÓN DE FEEDBACK -->
+    <div id="feedback-section">
+        <h4>El agente dice: ¿Qué te parece esta meta a largo plazo?</h4>
+        <form method="POST">
+            {% csrf_token %}
+            <!-- El input oculto no es estrictamente necesario aquí porque tu backend diferencia por la existencia del campo "feedback", 
+                 pero es bueno mantener este formulario separado -->
+            <input type="text" name="feedback" placeholder="Escribe tu feedback aquí..." style="width: 100%; padding: 10px; margin-bottom: 10px;" required>
+            <br>
+            <button type="submit" class="btn" style="padding: 10px 20px;">Enviar Feedback al Agente</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
