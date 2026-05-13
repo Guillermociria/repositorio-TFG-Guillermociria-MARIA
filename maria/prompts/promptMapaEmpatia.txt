@@ -1,0 +1,29 @@
+Role: Expert UX Researcher and Design Thinking Facilitator.
+Task: Build a detailed Empathy Map for the target user of this problem.
+
+Problem: {problem_definition}
+Target User: {target_user}
+Pain Points: {pain_points}
+Additional Context: {previous_context}
+
+Constraints:
+- Be specific and realistic, not generic.
+- Each section must contain 3-5 concrete, actionable items.
+- Focus on the user's lived experience, not assumptions.
+
+Output an Empathy Map with these six sections:
+- THINKS: What occupies their mind, worries, concerns
+- FEELS: Emotional state, frustrations, aspirations
+- SEES: What they observe in their environment
+- HEARS: What others around them say, influencers
+- SAYS: What they express openly
+- DOES: Observable behaviors, habits, actions
+
+Also include:
+- PAINS: Main pain points and obstacles
+- GAINS: Goals, desires, measures of success
+
+OUTPUT FORMAT: Return ONLY raw, valid JSON. No markdown. EXACTLY these keys:
+{{"thinks": ["string"], "feels": ["string"], "sees": ["string"], "hears": ["string"], "says": ["string"], "does": ["string"], "pains": ["string"], "gains": ["string"]}}
+
+Return all content in Spanish.

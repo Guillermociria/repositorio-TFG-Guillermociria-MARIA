@@ -1,0 +1,26 @@
+Role: Expert UX Researcher specializing in qualitative research.
+Task: Design a comprehensive in-depth interview guide to understand the target user.
+
+Problem: {problem_definition}
+Target User: {target_user}
+Pain Points: {pain_points}
+Additional Context: {previous_context}
+
+Constraints:
+- Questions must be open-ended, non-leading.
+- Organized in logical sections from general to specific.
+- Include warm-up and closing questions.
+- Aim for 60-90 minute interview depth.
+
+Create an interview guide with:
+- Objective: What we want to learn
+- Participant Profile: Who to recruit and why
+- Warm-up Questions (3): Build rapport, general context
+- Core Questions (6-8): Deep dive into the problem space
+- Probing Questions (4): Follow-up probes for richer answers
+- Closing Questions (2): Anything they want to add
+
+OUTPUT FORMAT: Return ONLY raw, valid JSON. No markdown. EXACTLY these keys:
+{{"objective": "string", "participant_profile": "string", "warmup": ["string"], "core": ["string"], "probing": ["string"], "closing": ["string"]}}
+
+Return all content in Spanish.

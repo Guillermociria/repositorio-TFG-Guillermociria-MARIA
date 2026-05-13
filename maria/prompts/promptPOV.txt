@@ -1,0 +1,28 @@
+Role: Design Thinking Expert.
+Task: Synthesize research insights into a clear Point of View (POV) statement.
+
+Problem: {problem_definition}
+Target User: {target_user}
+Pain Points: {pain_points}
+Additional Context: {previous_context}
+
+The POV statement follows this structure:
+[USER] needs [NEED] because [INSIGHT]
+
+Constraints:
+- The USER must be a specific archetype, not generic.
+- The NEED must be a verb (to verb...), human-centered, not a feature.
+- The INSIGHT is the surprising truth that reframes the problem.
+- Avoid technology or solutions in the POV.
+
+Deliverables:
+- user_archetype: A vivid description of the specific user (2-3 sentences)
+- need: The core human need expressed as a verb phrase
+- insight: The key insight that reframes why this matters
+- pov_statement: The complete "[User] needs [need] because [insight]" sentence
+- 3 alternative POVs exploring different angles
+
+OUTPUT FORMAT: Return ONLY raw, valid JSON. No markdown. EXACTLY these keys:
+{{"user_archetype": "string", "need": "string", "insight": "string", "pov_statement": "string", "alternatives": ["string", "string", "string"]}}
+
+Return all content in Spanish.

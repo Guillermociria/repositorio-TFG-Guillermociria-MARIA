@@ -1,0 +1,33 @@
+// Generic UVL schema for MARIA techniques
+// Use this as a template to define importable technique files.
+
+namespace <TechId>
+
+features
+  Technique
+    mandatory
+      id "<slug>"           // unique identifier (snake_case)
+      name "<display name>" // human-readable name
+      stage "<stage>"       // empatizar | definir | idear | prototipar | testear | ""
+    optional
+      icon "<emoji>"
+      inputs_description "<text>"
+      outputs_description "<text>"
+      prompt """
+<multiline default prompt>
+Use {problem_definition}, {target_user}, {pain_points}, {initial_idea}, {previous_context}.
+OUTPUT FORMAT: Return ONLY valid JSON. No markdown.
+"""
+
+  Questionnaire
+    or
+      Question
+        id "<q_id>"
+        label "<question label>"
+        type "<text|textarea|number|select>"
+        placeholder "<hint text>"   // for text | textarea | number
+        options "<opt1>,<opt2>"     // for select only
+
+constraints
+  // Add dependency constraints here if needed
+  // e.g. ThisTechnique => OtherTechnique

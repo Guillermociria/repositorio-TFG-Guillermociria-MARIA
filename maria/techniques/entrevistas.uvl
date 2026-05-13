@@ -1,0 +1,53 @@
+namespace Entrevistas
+
+features
+  Technique
+    mandatory
+      id "entrevistas"
+      name "Entrevistas en profundidad"
+      stage "empatizar"
+    optional
+      icon "🎤"
+      inputs_description "Problema, usuario objetivo"
+      outputs_description "Guía estructurada de entrevistas con preguntas clave"
+      prompt """
+Eres un experto en investigación de usuarios con enfoque Design Thinking.
+
+Contexto del problema:
+- Problema: {problem_definition}
+- Usuario objetivo: {target_user}
+- Dolores detectados: {pain_points}
+- Idea inicial: {initial_idea}
+
+Contexto previo de otras técnicas:
+{previous_context}
+
+Diseña una guía de entrevistas en profundidad estructurada por bloques temáticos.
+Cada bloque debe incluir un objetivo claro y entre 3 y 5 preguntas abiertas.
+
+OUTPUT FORMAT: Devuelve SOLO JSON válido con esta estructura:
+{
+  "objetivo_general": "string",
+  "bloques": [
+    {
+      "titulo": "string",
+      "objetivo": "string",
+      "preguntas": ["string", ...]
+    }
+  ],
+  "recomendaciones": ["string", ...]
+}
+"""
+
+  Questionnaire
+    or
+      Question
+        id "n_interviews"
+        label "Número de entrevistas a diseñar"
+        type "number"
+        placeholder "5"
+      Question
+        id "format"
+        label "Formato de entrevista"
+        type "select"
+        options "Presencial,Remoto,Híbrido"

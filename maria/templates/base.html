@@ -141,10 +141,9 @@ main{
 
 <h2>Secciones</h2>
 
-<a class="nav-item" href="/">Inicio</a>
-<a class="nav-item" href="/dashboard">Dashboard</a>
-<a class="nav-item" href="/analisis">Análisis</a>
-<a class="nav-item" href="/sprint">Sprint</a>
+<a class="nav-item" href="{% url 'dashboard' %}">Mis sesiones</a>
+<a class="nav-item" href="{% url 'catalog' %}">Catálogo de técnicas</a>
+<a class="nav-item" href="{% url 'profile' %}">Mi perfil</a>
 
 </aside>
 
@@ -156,8 +155,15 @@ main{
 <h1>Mi Plataforma</h1>
 
 <div class="header-links">
-<a href="/">Home</a>
-<a href="/feature-form">Formulario</a>
+{% if user.is_authenticated %}
+<a href="{% url 'profile' %}">{{ user.username }}</a>
+<form method="post" action="{% url 'logout' %}" style="display:inline;">
+{% csrf_token %}
+<button type="submit" style="background:none;border:none;cursor:pointer;color:var(--dark);font-weight:500;font-size:inherit;padding:0;">Salir</button>
+</form>
+{% else %}
+<a href="{% url 'login' %}">Iniciar sesión</a>
+{% endif %}
 </div>
 
 </header>

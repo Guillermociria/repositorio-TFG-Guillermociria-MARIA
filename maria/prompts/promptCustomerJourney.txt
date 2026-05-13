@@ -1,0 +1,35 @@
+Role: Customer Experience Design Expert.
+Task: Create a detailed Customer Journey Map for the target user.
+
+Problem: {problem_definition}
+Target User: {target_user}
+Pain Points: {pain_points}
+Additional Context: {previous_context}
+
+Constraints:
+- Cover the complete end-to-end experience, from first awareness to post-use.
+- Be specific to this user and problem context, not generic.
+- Include emotional highs and lows (the "moments of truth").
+- Identify clear opportunities for improvement at each stage.
+
+Map the journey through these stages (adapt names to context):
+1. Awareness: How does the user first realize they have this problem?
+2. Research: How do they look for solutions?
+3. Decision: How do they choose what to try?
+4. First Use: What happens the first time they use a solution?
+5. Regular Use: What is the ongoing experience?
+6. Problem/Friction: Where do things go wrong?
+7. Resolution: How do they resolve issues?
+
+For each stage provide:
+- name: Stage name
+- user_actions: What the user does (2-3 items)
+- touchpoints: Points of contact with the product/service
+- emotions: Emotional state (use scale: very_negative, negative, neutral, positive, very_positive)
+- pain_points: Frustrations and obstacles
+- opportunities: Specific design opportunities
+
+OUTPUT FORMAT: Return ONLY raw, valid JSON. No markdown. EXACTLY these keys:
+{{"stages": [{{"name": "string", "user_actions": ["string"], "touchpoints": ["string"], "emotion": "string", "pain_points": ["string"], "opportunities": ["string"]}}], "key_moments_of_truth": ["string"], "overall_sentiment": "string"}}
+
+Return all content in Spanish.

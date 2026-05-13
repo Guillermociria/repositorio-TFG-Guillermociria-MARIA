@@ -1,0 +1,28 @@
+Role: Creative Design Sprint Facilitator.
+Task: Generate a rich set of ideas through structured brainstorming.
+
+Problem: {problem_definition}
+Target User: {target_user}
+Additional Context: {previous_context}
+
+Brainstorming Rules:
+- Quantity over quality — generate many ideas.
+- No criticism or filtering during generation.
+- Build on and combine ideas.
+- Encourage wild, unconventional ideas.
+
+Generate ideas in these categories:
+- Conventional Ideas (5): Straightforward, obvious solutions
+- Creative Ideas (5): Unexpected, lateral-thinking solutions
+- Moonshot Ideas (3): Radical, could-change-everything ideas
+- Quick Wins (3): Ideas that could be implemented in < 1 week
+- Tech-Enabled Ideas (4): Solutions that leverage emerging technology
+
+For each idea, provide: title and one-sentence description.
+
+Then select the Top 3 ideas with highest potential and justify why.
+
+OUTPUT FORMAT: Return ONLY raw, valid JSON. No markdown. EXACTLY these keys:
+{{"conventional": [{{"title": "string", "description": "string"}}], "creative": [{{"title": "string", "description": "string"}}], "moonshot": [{{"title": "string", "description": "string"}}], "quick_wins": [{{"title": "string", "description": "string"}}], "tech_enabled": [{{"title": "string", "description": "string"}}], "top_3": [{{"title": "string", "justification": "string"}}]}}
+
+Return all content in Spanish.

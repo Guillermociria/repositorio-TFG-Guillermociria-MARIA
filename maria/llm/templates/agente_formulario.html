@@ -1,53 +1,1646 @@
 {% extends "base.html" %}
-
 {% block title %}Design Sprint - Agente{% endblock %}
 
 {% block content %}
-<div class="sprint-container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
-    <h2>Design Sprint con IA</h2>
-    <p>Completa estos datos para que el agente inicie el análisis del Design Sprint.</p>
-    <br>
+<style>
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --bg: #f8fafc;
+  --card-bg: #ffffff;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --radius: 12px;
+}
 
-    <!-- FORMULARIO 1: INICIO DEL SPRINT -->
-    <form method="POST" id="sprint-form">
-        {% csrf_token %}
-        
-        <div style="margin-bottom: 15px;">
-            <h3>1. Definición del Problema</h3>
-            <textarea name="problema" rows="3" style="width: 100%;" placeholder="Describe el problema principal que quieres resolver..." required></textarea>
-        </div>
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-        <div style="margin-bottom: 15px;">
-            <h3>2. Público Objetivo (Usuario)</h3>
-            <input type="text" name="usuario" style="width: 100%; padding: 8px;" placeholder="Ej: Jóvenes de 18 a 25 años que estudian en la universidad..." required>
-        </div>
+.sprint-wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 28px 20px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: var(--text);
+}
 
-        <div style="margin-bottom: 15px;">
-            <h3>3. Puntos de Dolor (Pain Points)</h3>
-            <textarea name="dolores" rows="3" style="width: 100%;" placeholder="¿Qué le frustra o le duele al usuario actualmente con este problema?"></textarea>
-        </div>
+h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 6px; }
+h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
+h3 { font-size: 1.05rem; font-weight: 600; }
 
-        <div style="margin-bottom: 20px;">
-            <h3>4. Idea Inicial</h3>
-            <textarea name="idea" rows="3" style="width: 100%;" placeholder="¿Tienes alguna idea inicial de cómo solucionarlo? (Opcional)"></textarea>
-        </div>
+.subtitle { color: var(--text-muted); margin-bottom: 28px; font-size: 0.95rem; }
 
-        <button type="submit" class="btn" style="padding: 10px 20px; font-size: 16px;">Iniciar Sprint</button>
-    </form>
+/* Form */
+.form-group { margin-bottom: 18px; }
+.form-group label {
+  display: block; font-weight: 600; margin-bottom: 6px;
+  font-size: 0.88rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;
+}
+.form-group input,
+.form-group textarea {
+  width: 100%; padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px; font-size: 0.95rem;
+  font-family: inherit; color: var(--text);
+  background: #fff;
+  transition: border-color 0.2s;
+  resize: vertical;
+}
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none; border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+}
 
-    <hr style="margin: 40px 0; border: 1px solid #ccc;">
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 20px; border-radius: 8px; font-size: 0.93rem;
+  font-weight: 600; cursor: pointer; border: none;
+  transition: all 0.15s; font-family: inherit;
+}
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover { background: #16a34a; }
+.btn-warning { background: var(--warning); color: #fff; }
+.btn-warning:hover { background: #d97706; }
+.btn-ghost {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--text-muted);
+}
+.btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+.btn-sm { padding: 6px 12px; font-size: 0.82rem; }
 
-    <!-- FORMULARIO 2: SECCIÓN DE FEEDBACK -->
-    <div id="feedback-section">
-        <h4>El agente dice: ¿Qué te parece esta meta a largo plazo?</h4>
-        <form method="POST">
-            {% csrf_token %}
-            <!-- El input oculto no es estrictamente necesario aquí porque tu backend diferencia por la existencia del campo "feedback", 
-                 pero es bueno mantener este formulario separado -->
-            <input type="text" name="feedback" placeholder="Escribe tu feedback aquí..." style="width: 100%; padding: 10px; margin-bottom: 10px;" required>
-            <br>
-            <button type="submit" class="btn" style="padding: 10px 20px;">Enviar Feedback al Agente</button>
-        </form>
-    </div>
+/* Card panel */
+.panel {
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+/* Catalog grid */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.tech-card {
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.tech-card:hover { border-color: var(--primary); box-shadow: 0 4px 14px rgba(99,102,241,0.12); }
+.tech-card.selected { border-color: var(--primary); background: #eef2ff; }
+.tech-card.tc-done { border-color: var(--success); }
+.tech-card.tc-disabled { opacity: 0.38; cursor: not-allowed; pointer-events: none; }
+.tc-done-badge {
+  display: inline-block; font-size: 0.68rem; font-weight: 700;
+  background: #dcfce7; color: #15803d; border-radius: 20px;
+  padding: 2px 8px; margin-bottom: 6px;
+}
+.tc-stage-badge {
+  display: inline-block; font-size: 0.68rem; font-weight: 700;
+  background: #f3f4f6; color: #9ca3af; border-radius: 20px;
+  padding: 2px 8px; margin-bottom: 6px;
+}
+
+.tech-card .tc-icon { font-size: 1.9rem; margin-bottom: 8px; line-height: 1; }
+.tech-card .tc-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; line-height: 1.3; }
+.tech-card .tc-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
+.tech-card .tc-val { font-size: 0.78rem; color: var(--text); margin-bottom: 6px; line-height: 1.4; }
+
+.tc-add-btn {
+  position: absolute; top: 10px; right: 10px;
+  width: 26px; height: 26px; border-radius: 50%;
+  font-size: 1rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  border: none; cursor: pointer; transition: all 0.15s;
+  background: var(--primary); color: #fff;
+  font-weight: 700;
+}
+.tech-card.selected .tc-add-btn { background: var(--success); }
+
+/* Timeline */
+.timeline-wrap {
+  min-height: 80px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 6px;
+  transition: border-color 0.15s;
+}
+.timeline-wrap.drag-active { border-color: var(--primary); background: #f5f3ff; }
+
+.timeline-empty {
+  text-align: center; color: var(--text-muted);
+  font-style: italic; font-size: 0.88rem;
+  padding: 12px 0;
+}
+
+.timeline-list { display: flex; flex-direction: column; gap: 0; }
+
+.tl-stage-group { margin-bottom: 14px; }
+.tl-stage-label {
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text-muted);
+  padding-bottom: 6px; margin-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.tl-stage-items { display: flex; flex-direction: column; gap: 6px; }
+
+.tl-item {
+  display: flex; align-items: center; gap: 8px;
+  background: #eef2ff;
+  border: 1.5px solid var(--primary);
+  border-radius: 8px; padding: 8px 10px;
+  cursor: grab; user-select: none;
+  font-size: 0.85rem; font-weight: 600;
+  transition: opacity 0.15s;
+}
+.tl-item:active { cursor: grabbing; }
+.tl-item.dragging { opacity: 0.4; }
+.tl-item.drag-over { background: #c7d2fe; }
+
+.tl-step {
+  background: var(--primary); color: #fff;
+  width: 20px; height: 20px; border-radius: 50%;
+  font-size: 0.68rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.tl-remove {
+  background: none; border: none;
+  color: var(--text-muted); cursor: pointer;
+  font-size: 1rem; line-height: 1; padding: 0 2px;
+  margin-left: 2px;
+}
+.tl-remove:hover { color: var(--danger); }
+
+/* Section header */
+.sec-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.sec-header h2 { margin-bottom: 0; }
+.badge {
+  font-size: 0.78rem; font-weight: 600;
+  background: #eef2ff; color: var(--primary);
+  border-radius: 99px; padding: 3px 10px;
+}
+
+/* Execution screen */
+.exec-header {
+  display: flex; align-items: flex-start; gap: 16px;
+  margin-bottom: 20px; padding-bottom: 18px;
+  border-bottom: 1.5px solid var(--border);
+}
+.exec-icon { font-size: 2.4rem; line-height: 1; flex-shrink: 0; }
+.exec-meta { flex: 1; }
+.exec-meta h2 { margin-bottom: 4px; }
+.exec-meta p { color: var(--text-muted); font-size: 0.88rem; }
+.exec-step { font-size: 0.85rem; color: var(--text-muted); white-space: nowrap; padding-top: 4px; }
+
+.progress-bar-wrap {
+  background: var(--border); border-radius: 99px; height: 6px;
+  margin-bottom: 22px; overflow: hidden;
+}
+.progress-bar {
+  background: linear-gradient(90deg, var(--primary), #818cf8);
+  height: 100%; border-radius: 99px; transition: width 0.4s ease;
+}
+
+.output-box {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  min-height: 200px;
+  max-height: 500px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+.out-section { margin-bottom: 18px; }
+.out-section:last-child { margin-bottom: 0; }
+.out-key {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--primary);
+  margin-bottom: 6px; padding-bottom: 4px;
+  border-bottom: 1px solid #e0e7ff;
+}
+.out-text { color: var(--text); margin: 0; line-height: 1.65; }
+.out-list { margin: 0; padding-left: 18px; }
+.out-list-item { color: var(--text); margin-bottom: 4px; line-height: 1.5; }
+.out-nested { background: white; border-radius: 6px; padding: 10px 14px; border: 1px solid var(--border); margin-top: 4px; }
+.out-nested .out-key { color: var(--text-muted); border-color: var(--border); }
+.out-raw {
+  font-family: 'Cascadia Code','Fira Code',monospace;
+  font-size: 0.78rem; line-height: 1.6;
+  white-space: pre-wrap; color: var(--text); margin: 0;
+}
+.out-empty { color: var(--text-muted); font-style: italic; }
+.out-tag {
+  display: inline-block; padding: 2px 8px; border-radius: 99px;
+  font-size: 0.72rem; font-weight: 700; margin: 2px;
+  background: #eef2ff; color: var(--primary);
+}
+
+.feedback-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.feedback-row label { font-weight: 600; font-size: 0.9rem; }
+
+.feedback-area textarea {
+  width: 100%; padding: 10px 14px;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 0.93rem; font-family: inherit; resize: vertical;
+  margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+.feedback-area textarea:focus { outline: none; border-color: var(--primary); }
+
+.exec-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* Results summary */
+.results-grid { display: grid; gap: 16px; margin: 24px 0; text-align: left; }
+.result-card {
+  background: var(--card-bg); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 18px;
+}
+.result-card h4 {
+  font-size: 0.88rem; color: var(--text-muted);
+  margin-bottom: 10px; font-weight: 600;
+}
+.result-body {
+  font-size: 0.82rem; max-height: 220px; overflow-y: auto;
+}
+.result-body .out-key { font-size: 0.66rem; }
+.result-body .out-text { font-size: 0.82rem; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15,23,42,0.45);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 500; padding: 16px;
+}
+.modal {
+  background: #fff; border-radius: var(--radius);
+  width: 100%; max-width: 620px;
+  padding: 28px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+}
+.modal h3 { margin-bottom: 6px; }
+.modal .modal-sub { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px; }
+.modal textarea {
+  width: 100%; height: 220px;
+  padding: 12px 14px; font-size: 0.85rem;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  font-family: 'Cascadia Code', 'Fira Code', monospace;
+  resize: vertical; margin-bottom: 16px;
+}
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* Loading overlay */
+.loading-overlay {
+  position: fixed; inset: 0;
+  background: rgba(248,250,252,0.88);
+  backdrop-filter: blur(4px);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 400;
+}
+.spinner {
+  width: 52px; height: 52px;
+  border: 4px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  margin-bottom: 18px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Context chain panel */
+.ctx-panel {
+  border: 1.5px solid var(--border); border-radius: var(--radius);
+  margin-bottom: 18px; overflow: hidden;
+}
+.ctx-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px; background: var(--bg);
+  cursor: pointer; user-select: none;
+  font-size: 0.82rem; font-weight: 600; color: var(--text-muted);
+  border: none; width: 100%; text-align: left;
+}
+.ctx-toggle:hover { background: #f1f5f9; }
+.ctx-toggle .ctx-arrow { transition: transform 0.2s; }
+.ctx-toggle.open .ctx-arrow { transform: rotate(180deg); }
+.ctx-body { display: none; padding: 14px 16px; background: #fff; }
+.ctx-body.open { display: block; }
+.ctx-chip-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.ctx-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 99px;
+  font-size: 0.75rem; font-weight: 600;
+  background: #eef2ff; color: var(--primary);
+  border: 1px solid #c7d2fe;
+}
+.ctx-preview {
+  font-size: 0.78rem; color: var(--text-muted);
+  background: var(--bg); border-radius: 6px;
+  padding: 8px 12px; max-height: 120px; overflow-y: auto;
+  white-space: pre-wrap; font-family: 'Cascadia Code','Fira Code',monospace;
+  line-height: 1.5;
+}
+
+/* Final screen */
+.final-screen { text-align: center; padding: 48px 20px; }
+.final-screen .final-icon { font-size: 3.5rem; margin-bottom: 16px; }
+.final-screen h2 { font-size: 2rem; margin-bottom: 10px; }
+.final-screen p { color: var(--text-muted); margin-bottom: 28px; }
+</style>
+
+<!-- Loading overlay -->
+<div id="pantalla-carga" class="loading-overlay" style="display:none;">
+  <div class="spinner"></div>
+  <p style="font-weight:600; color:var(--text-muted); font-size:0.95rem;">El agente está procesando...</p>
 </div>
+
+<!-- Modal corregir (feedback + prompt unificados) -->
+<div id="corregir-modal" class="modal-overlay" style="display:none;" onclick="onCorregirOverlay(event)">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:600px; max-height:90vh; overflow-y:auto;">
+    <h3>Corregir resultado</h3>
+    <p class="modal-sub">
+      Puedes añadir instrucciones, editar el prompt o ambas cosas. Todo es opcional: también puedes reintentar sin cambios.
+    </p>
+
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>Instrucciones adicionales <span style="font-weight:400; color:#aaa;">(opcional)</span></label>
+      <textarea id="corr-feedback" rows="4"
+        style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:6px; font-size:14px; font-family:inherit; resize:vertical;"
+        placeholder="Ej: Sé más concreto, añade más opciones, cambia el tono..."></textarea>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <button type="button" class="btn btn-ghost btn-sm" onclick="togglePromptSection()"
+        style="font-size:0.82rem;">
+        <span id="corr-prompt-toggle-icon">▶</span> Editar prompt (avanzado)
+      </button>
+      <div id="corr-prompt-section" style="display:none; margin-top:10px;">
+        <p style="font-size:0.8rem; color:#aaa; margin-bottom:6px;">
+          Deja en blanco para usar el prompt por defecto de la técnica.
+        </p>
+        <textarea id="corr-prompt" rows="8"
+          style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:6px; font-size:0.82rem; font-family:'Cascadia Code','Fira Code',monospace; resize:vertical;"
+          placeholder="Instrucciones completas para el agente LLM…"></textarea>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="cerrarCorregir()">Cancelar</button>
+      <button class="btn btn-warning" onclick="confirmarCorreccion()">↺ Reintentar</button>
+    </div>
+  </div>
+</div>
+
+<!-- New technique modal -->
+<div id="new-tech-modal" class="modal-overlay" style="display:none;" onclick="onNtOverlayClick(event)">
+  <div class="modal" style="max-width:680px;" onclick="event.stopPropagation()">
+    <h3>Nueva técnica personalizada</h3>
+    <p class="modal-sub">
+      Crea una técnica con su propio prompt. Usa las variables
+      <code>{problem_definition}</code>, <code>{target_user}</code>, <code>{pain_points}</code>,
+      <code>{initial_idea}</code>, <code>{previous_context}</code> en el prompt.
+      Devuelve siempre JSON válido.
+    </p>
+    <div style="display:flex; gap:12px;">
+      <div class="form-group" style="flex:0 0 70px;">
+        <label>Emoji</label>
+        <input id="nt-icon" type="text" maxlength="4" placeholder="⚙️"
+          style="text-align:center; font-size:1.4rem; padding:6px;">
+      </div>
+      <div class="form-group" style="flex:1;">
+        <label>Nombre *</label>
+        <input id="nt-name" type="text" placeholder="Ej: Análisis de competidores" oninput="autoNtId()">
+      </div>
+      <div class="form-group" style="flex:0 0 180px;">
+        <label>ID (slug) *</label>
+        <input id="nt-id" type="text" placeholder="analisis_competidores"
+          style="font-family:monospace; font-size:0.85rem;">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Fase</label>
+      <select id="nt-stage" style="width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:0.95rem; font-family:inherit; background:#fff;">
+        <option value="">— Sin asignar —</option>
+        <option value="empatizar">🔍 Empatizar</option>
+        <option value="definir">🎯 Definir</option>
+        <option value="idear">💡 Idear</option>
+        <option value="prototipar">🛠️ Prototipar</option>
+        <option value="testear">🧪 Testear</option>
+      </select>
+    </div>
+    <div style="display:flex; gap:12px;">
+      <div class="form-group" style="flex:1;">
+        <label>Descripción de entradas</label>
+        <input id="nt-inputs" type="text" placeholder="Ej: Problema, usuario objetivo">
+      </div>
+      <div class="form-group" style="flex:1;">
+        <label>Descripción de salidas</label>
+        <input id="nt-outputs" type="text" placeholder="Ej: Análisis con gaps de 5 competidores">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Prompt por defecto *</label>
+      <textarea id="nt-prompt" rows="7"
+        style="font-family:'Cascadia Code','Fira Code',monospace; font-size:0.82rem;"
+        placeholder="Eres un experto en...&#10;Problema: {problem_definition}&#10;Usuario: {target_user}&#10;&#10;Realiza X análisis.&#10;&#10;OUTPUT FORMAT: Devuelve SOLO JSON válido. Sin markdown."></textarea>
+    </div>
+
+    <!-- Questionnaire builder -->
+    <div style="margin-bottom:16px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+        <label style="display:block; font-weight:600; font-size:13px; color:var(--text);">
+          Preguntas del formulario previo
+          <span style="font-weight:400; color:var(--text-muted);">(opcional)</span>
+        </label>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="addQuestion()">+ Añadir pregunta</button>
+      </div>
+      <div id="nt-questions" style="display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="cerrarModalNuevaTech()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarNuevaTech()">Guardar técnica</button>
+    </div>
+  </div>
+</div>
+
+<div class="sprint-wrap">
+
+<!-- ======================================================== -->
+<!-- PANTALLA 0: CONTEXTO DEL PROBLEMA                        -->
+<!-- ======================================================== -->
+<div id="pantalla-contexto">
+  <h1>Design Sprint con IA</h1>
+  <p class="subtitle">Define el contexto del problema antes de seleccionar las técnicas.</p>
+
+  <div class="panel">
+    <div class="form-group">
+      <label>Definición del problema *</label>
+      <textarea id="inp-problema" rows="3"
+        placeholder="Describe el problema principal que quieres resolver..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Público objetivo *</label>
+      <input id="inp-usuario" type="text"
+        placeholder="Ej: Estudiantes universitarios de 18-25 años...">
+    </div>
+    <div class="form-group">
+      <label>Puntos de dolor</label>
+      <textarea id="inp-dolores" rows="2"
+        placeholder="¿Qué frustra o le duele al usuario actualmente?"></textarea>
+    </div>
+    <div class="form-group" style="margin-bottom:0;">
+      <label>Idea inicial <span style="font-weight:400;">(opcional)</span></label>
+      <textarea id="inp-idea" rows="2"
+        placeholder="¿Tienes alguna idea de cómo solucionarlo?"></textarea>
+    </div>
+  </div>
+
+  <div style="display:flex; justify-content:flex-end;">
+    <button class="btn btn-primary" onclick="irASeleccion()">
+      Seleccionar técnicas →
+    </button>
+  </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- PANTALLA 1: SELECCIÓN Y ORDENACIÓN DE TÉCNICAS           -->
+<!-- ======================================================== -->
+<div id="pantalla-seleccion" style="display:none;">
+  <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+    <button class="btn btn-ghost btn-sm" onclick="irAContexto()">← Volver</button>
+    <div>
+      <h1>Selecciona las técnicas</h1>
+      <p class="subtitle" style="margin:0;">Elige y ordena el pipeline del agente.</p>
+    </div>
+  </div>
+
+  <!-- Active stages pills -->
+  <div id="stages-pills" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px;"></div>
+
+  <!-- Catalog -->
+  <div class="sec-header">
+    <h2>Catálogo de técnicas</h2>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <span class="badge" id="catalog-badge" style="display:none;"></span>
+      {% if is_admin %}<button class="btn btn-ghost btn-sm" onclick="abrirModalNuevaTech()">+ Nueva técnica</button>{% endif %}
+    </div>
+  </div>
+  <div class="catalog-grid" id="catalog-grid"></div>
+
+  <!-- Timeline -->
+  <div class="sec-header" style="margin-top:28px;">
+    <h2>Pipeline</h2>
+    <span style="font-size:0.82rem; color:var(--text-muted);">Arrastra para reordenar</span>
+  </div>
+  <div class="timeline-wrap" id="timeline-wrap"
+       ondragover="onDragOverZone(event)" ondrop="onDropZone(event)"
+       ondragleave="onDragLeaveZone(event)">
+    <div class="timeline-empty" id="timeline-empty">
+      Haz clic en «+» de cualquier técnica para añadirla al pipeline
+    </div>
+    <div class="timeline-list" id="timeline-list"></div>
+  </div>
+
+  <div style="display:flex; justify-content:flex-end; margin-top:20px;">
+    <button class="btn btn-primary" id="btn-iniciar" onclick="iniciarSprint()" disabled>
+      Iniciar Sprint →
+    </button>
+  </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- PANTALLA 2: EJECUCIÓN SECUENCIAL POR TÉCNICA             -->
+<!-- ======================================================== -->
+<div id="pantalla-ejecucion" style="display:none;">
+  <div class="exec-header">
+    <div class="exec-icon" id="exec-icon">⚙️</div>
+    <div class="exec-meta">
+      <h2 id="exec-nombre">Técnica</h2>
+      <p id="exec-descripcion"></p>
+    </div>
+    <div class="exec-step" id="exec-step">Paso 1 / 1</div>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+  </div>
+
+  <!-- Context chain panel -->
+  <div class="ctx-panel" id="ctx-panel" style="display:none;">
+    <button class="ctx-toggle" id="ctx-toggle" onclick="toggleCtx()">
+      <span id="ctx-toggle-label">Contexto anterior (0 técnicas)</span>
+      <span class="ctx-arrow">▾</span>
+    </button>
+    <div class="ctx-body" id="ctx-body">
+      <div class="ctx-chip-list" id="ctx-chips"></div>
+      <div class="ctx-preview" id="ctx-preview"></div>
+    </div>
+  </div>
+
+  <!-- Pre-inputs questionnaire (shown before technique runs) -->
+  <div id="pre-inputs-section" style="display:none;">
+    <div class="panel" style="margin-bottom:16px;">
+      <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:16px;">
+        Antes de generar, puedes dar instrucciones específicas para esta técnica.<br>
+        Si no necesitas personalizar nada, haz clic en <strong>Saltar</strong>.
+      </p>
+      <div id="pre-inputs-form"></div>
+    </div>
+    <div class="exec-actions">
+      <button class="btn btn-ghost" onclick="enviarPreInputs(true)">Saltar →</button>
+      <button class="btn btn-primary" onclick="enviarPreInputs(false)">Generar ✓</button>
+    </div>
+  </div>
+
+  <!-- Output + review (shown after technique runs) -->
+  <div id="output-section" style="display:none;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+      <span id="attempt-badge" style="display:none; font-size:0.75rem; font-weight:700; color:var(--warning); background:#fffbeb; border:1px solid #fde68a; padding:2px 10px; border-radius:99px;"></span>
+      <span></span>
+    </div>
+    <div class="output-box" id="output-box">
+      <span style="color:var(--text-muted); font-style:italic;">
+        Los resultados aparecerán aquí...
+      </span>
+    </div>
+
+    <!-- Retry history -->
+    <div id="history-panel" style="display:none; margin-bottom:16px;">
+      <div class="ctx-panel">
+        <button class="ctx-toggle" id="history-toggle" onclick="toggleHistory()">
+          <span id="history-label">Intentos anteriores (0)</span>
+          <span class="ctx-arrow">▾</span>
+        </button>
+        <div class="ctx-body" id="history-body">
+          <div id="history-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
+      <button class="btn btn-ghost btn-sm" id="btn-toggle-json" onclick="toggleJsonView()">{ } JSON</button>
+    </div>
+
+    <div class="exec-actions">
+      <button class="btn btn-warning" onclick="abrirCorregir()">
+        ↺ Corregir
+      </button>
+      <button class="btn btn-ghost" id="btn-simular" onclick="abrirSimular()" title="La IA simula respuestas al output de esta técnica">
+        ▶ Simular respuestas
+      </button>
+      <button class="btn btn-success" onclick="enviarFeedback('approve', '')">
+        ✓ Aprobar y continuar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal simular respuestas -->
+<div id="sim-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:200; justify-content:center; align-items:flex-start; overflow-y:auto; padding:32px 16px;" onclick="cerrarSimular(event)">
+  <div style="background:#fff; border-radius:12px; padding:28px; width:100%; max-width:620px; margin:auto; box-shadow:0 8px 32px rgba(0,0,0,0.18);" onclick="event.stopPropagation()">
+    <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:6px; color:var(--primary);">▶ Simular respuestas con IA</h3>
+    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px;">
+      La IA actuará como el usuario objetivo y generará respuestas realistas al output de esta técnica (ej: responder preguntas de entrevista, reaccionar ante prototipos, etc.).
+    </p>
+    <div id="sim-output-wrap">
+      <div id="sim-status" style="text-align:center; color:var(--text-muted); font-style:italic; padding:20px 0; font-size:0.9rem;">
+        Haz clic en «Simular» para generar las respuestas.
+      </div>
+      <div class="output-box" id="sim-output-box" style="display:none;"></div>
+    </div>
+    <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:16px;">
+      <button class="btn btn-ghost" onclick="cerrarSimular()">Cerrar</button>
+      <button class="btn btn-primary" id="sim-run-btn" onclick="ejecutarSimulacion()">▶ Simular</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- PANTALLA 3: SPRINT COMPLETADO                            -->
+<!-- ======================================================== -->
+<div id="pantalla-final" class="final-screen" style="display:none;">
+  <div class="final-icon">✅</div>
+  <h2>Sprint completado</h2>
+  <p>Se han ejecutado todas las técnicas del pipeline.</p>
+  <div class="results-grid" id="results-grid"></div>
+  <button class="btn btn-primary" onclick="location.href='{% url 'dashboard' %}'">← Volver al dashboard</button>
+</div>
+
+</div><!-- .sprint-wrap -->
+
+{{ all_techniques|json_script:"custom-tech-data" }}
+<script>
+// ─── CSRF ──────────────────────────────────────────────────────────────────
+const getCsrf = () =>
+  document.cookie.match(/csrftoken=([^;]+)/)?.[1] ||
+  document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+
+// ─── Stages ────────────────────────────────────────────────────────────────
+const SESSION_STAGES = {{ session_stages|safe }};
+const ALL_STAGES = [
+  { id: 'empatizar',  label: 'Empatizar',  icon: '🔍' },
+  { id: 'definir',    label: 'Definir',    icon: '🎯' },
+  { id: 'idear',      label: 'Idear',      icon: '💡' },
+  { id: 'prototipar', label: 'Prototipar', icon: '🛠️' },
+  { id: 'testear',    label: 'Testear',    icon: '🧪' },
+];
+const activeStages = SESSION_STAGES.length > 0 ? new Set(SESSION_STAGES) : null;
+
+// ─── Technique Catalog — loaded entirely from DB ───────────────────────────
+const TECHNIQUES = JSON.parse(document.getElementById('custom-tech-data').textContent).map(t => ({
+  id:           t.tech_id,
+  name:         t.name,
+  icon:         t.icon,
+  stage:        t.stage || '',
+  desc:         t.inputs_description,
+  inputs:       t.inputs_description,
+  outputs:      t.outputs_description,
+  isCustom:     !t.is_builtin,
+  questionnaire: t.questionnaire || [],
+}));
+
+// ─── Technique Questionnaires — derived from DB ────────────────────────────
+const TECHNIQUE_QUESTIONNAIRES = Object.fromEntries(
+  TECHNIQUES.map(t => [t.id, t.questionnaire])
+);
+
+// ─── LLM Providers ─────────────────────────────────────────────────────────
+const AVAILABLE_PROVIDERS = {{ available_providers|safe }};
+let techniqueLlmProviders = {};  // { techId: "google" | "openai" | "anthropic" }
+
+// ─── App State ─────────────────────────────────────────────────────────────
+let selectedIds = [];
+let techniquePrompts = {};
+let allOutputs = {};
+let techHistory = {};   // { techId: [{output, feedback}] }
+let techAttempt = {};   // { techId: number }
+let lastFeedback = '';
+let currentTechIdx = 0;
+let editingPromptId = null;
+let dragSrcIdx = null;
+
+// ─── Screens ───────────────────────────────────────────────────────────────
+const S = {
+  contexto:  document.getElementById('pantalla-contexto'),
+  seleccion: document.getElementById('pantalla-seleccion'),
+  ejecucion: document.getElementById('pantalla-ejecucion'),
+  final:     document.getElementById('pantalla-final'),
+  carga:     document.getElementById('pantalla-carga'),
+};
+
+function showScreen(name) {
+  Object.values(S).forEach(s => { if (s !== S.carga) s.style.display = 'none'; });
+  S[name].style.display = (name === 'final') ? 'block' : 'block';
+}
+
+function setLoading(on) {
+  S.carga.style.display = on ? 'flex' : 'none';
+}
+
+// ─── Navigation ────────────────────────────────────────────────────────────
+function irAContexto() { showScreen('contexto'); }
+
+function renderStagePills() {
+  const container = document.getElementById('stages-pills');
+  container.innerHTML = '';
+  const stages = activeStages ? ALL_STAGES.filter(s => activeStages.has(s.id)) : ALL_STAGES;
+  stages.forEach(s => {
+    const pill = document.createElement('span');
+    pill.style.cssText = 'padding:4px 12px; border-radius:20px; font-size:0.78rem; font-weight:600; background:#eef2ff; color:var(--primary);';
+    pill.textContent = `${s.icon} ${s.label}`;
+    container.appendChild(pill);
+  });
+}
+
+function irASeleccion() {
+  const p = document.getElementById('inp-problema').value.trim();
+  const u = document.getElementById('inp-usuario').value.trim();
+  if (!p || !u) {
+    alert('El problema y el público objetivo son obligatorios.');
+    return;
+  }
+  renderStagePills();
+  renderCatalog();
+  renderTimeline();
+  showScreen('seleccion');
+}
+
+const IS_ADMIN = {% if is_admin %}true{% else %}false{% endif %};
+
+// ─── Catalog ───────────────────────────────────────────────────────────────
+function makeTechCard(t) {
+  const sel = selectedIds.includes(t.id);
+  const done = !!allOutputs[t.id];
+  const stageRestricted = activeStages && t.stage && !activeStages.has(t.stage);
+
+  const card = document.createElement('div');
+  let cls = 'tech-card';
+  if (sel) cls += ' selected';
+  if (done) cls += ' tc-done';
+  if (stageRestricted) cls += ' tc-disabled';
+  card.className = cls;
+
+  const doneBadge = done
+    ? `<span class="tc-done-badge">✓ Completado</span>`
+    : '';
+  const stageBadge = stageRestricted
+    ? `<span class="tc-stage-badge">Fuera del sprint</span>`
+    : '';
+  const deleteBtn = (t.isCustom && IS_ADMIN)
+    ? `<button class="tl-remove" style="position:absolute;top:10px;left:10px;font-size:0.85rem;"
+        onclick="eliminarTech('${t.id}',event)" title="Eliminar técnica">🗑</button>`
+    : '';
+  const addBtn = stageRestricted
+    ? ''
+    : `<button class="tc-add-btn" onclick="toggleTech('${t.id}',event)"
+        title="${sel ? 'Quitar del pipeline' : 'Añadir al pipeline'}">
+        ${sel ? '✓' : '+'}
+      </button>`;
+
+  card.innerHTML = `
+    ${addBtn}
+    ${deleteBtn}
+    ${doneBadge}
+    ${stageBadge}
+    <div class="tc-icon">${t.icon}</div>
+    <div class="tc-name">${t.name}</div>
+    <div class="tc-label">Entrada</div>
+    <div class="tc-val">${t.inputs}</div>
+    <div class="tc-label">Salida</div>
+    <div class="tc-val">${t.outputs}</div>
+  `;
+  return card;
+}
+
+function renderCatalog() {
+  const container = document.getElementById('catalog-grid');
+  container.innerHTML = '';
+
+  ALL_STAGES.forEach(stage => {
+    const techs = TECHNIQUES.filter(t => t.stage === stage.id);
+    if (techs.length === 0) return;
+
+    const stageActive = !activeStages || activeStages.has(stage.id);
+    const header = document.createElement('div');
+    header.style.cssText = 'grid-column:1/-1; margin:10px 0 4px; font-size:0.82rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;';
+    header.style.color = stageActive ? 'var(--text-muted)' : '#ccc';
+    header.textContent = stageActive
+      ? `${stage.icon} ${stage.label}`
+      : `${stage.icon} ${stage.label} — no incluida en este sprint`;
+    container.appendChild(header);
+
+    techs.forEach(t => container.appendChild(makeTechCard(t)));
+  });
+
+  // Unassigned / custom without stage (always selectable)
+  const unassigned = TECHNIQUES.filter(t => !t.stage);
+  if (unassigned.length > 0) {
+    const header = document.createElement('div');
+    header.style.cssText = 'grid-column:1/-1; margin:10px 0 4px; font-size:0.82rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em;';
+    header.textContent = '⚙️ Otras';
+    container.appendChild(header);
+    unassigned.forEach(t => container.appendChild(makeTechCard(t)));
+  }
+
+  const badge = document.getElementById('catalog-badge');
+  if (selectedIds.length > 0) {
+    badge.textContent = selectedIds.length + ' seleccionada' + (selectedIds.length > 1 ? 's' : '');
+    badge.style.display = 'inline';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function toggleTech(id, e) {
+  e.stopPropagation();
+  const tech = TECHNIQUES.find(x => x.id === id);
+  if (activeStages && tech?.stage && !activeStages.has(tech.stage)) return;
+  const i = selectedIds.indexOf(id);
+  if (i === -1) {
+    const tech = TECHNIQUES.find(x => x.id === id);
+    const stage = tech?.stage || '';
+    const stagePos = s => { const p = ['empatizar','definir','idear','prototipar','testear'].indexOf(s); return p === -1 ? 999 : p; };
+    const myPos = stagePos(stage);
+    let insertAt = selectedIds.length;
+    for (let j = 0; j < selectedIds.length; j++) {
+      const t = TECHNIQUES.find(x => x.id === selectedIds[j]);
+      if (stagePos(t?.stage || '') > myPos) { insertAt = j; break; }
+    }
+    selectedIds.splice(insertAt, 0, id);
+  } else {
+    selectedIds.splice(i, 1);
+  }
+  renderCatalog();
+  renderTimeline();
+}
+
+// ─── Timeline ──────────────────────────────────────────────────────────────
+const TL_STAGE_ORDER = ['empatizar','definir','idear','prototipar','testear',''];
+const TL_STAGE_LABELS = {
+  empatizar: '🔍 Empatizar', definir: '🎯 Definir', idear: '💡 Idear',
+  prototipar: '🛠️ Prototipar', testear: '🧪 Testear', '': '⚙️ Otras',
+};
+
+function makeTlItem(id, globalIdx, stepNum) {
+  const t = TECHNIQUES.find(x => x.id === id);
+  if (!t) return null;
+  const item = document.createElement('div');
+  item.className = 'tl-item';
+  item.draggable = true;
+  item.dataset.idx = globalIdx;
+
+  let providerSel = '';
+  if (AVAILABLE_PROVIDERS.length > 1) {
+    const opts = AVAILABLE_PROVIDERS.map(p =>
+      `<option value="${p.id}" ${(techniqueLlmProviders[id] || 'google') === p.id ? 'selected' : ''}>${p.label}</option>`
+    ).join('');
+    providerSel = `<select class="tl-llm-sel" onclick="event.stopPropagation()"
+      onchange="techniqueLlmProviders['${id}']=this.value" style="font-size:0.72rem;padding:2px 4px;border:1px solid #ddd;border-radius:4px;background:#fff;color:#555;margin-left:auto;margin-right:6px;">${opts}</select>`;
+  }
+
+  item.innerHTML = `
+    <span class="tl-step">${stepNum}</span>
+    <span>${t.icon}</span>
+    <span>${t.name}</span>
+    ${providerSel}
+    <button class="tl-remove" onclick="removeTech('${id}',event)" title="Quitar">×</button>
+  `;
+  item.addEventListener('dragstart', tlDragStart);
+  item.addEventListener('dragover',  tlDragOver);
+  item.addEventListener('dragleave', tlDragLeave);
+  item.addEventListener('drop',      tlDrop);
+  item.addEventListener('dragend',   tlDragEnd);
+  return item;
+}
+
+function renderTimeline() {
+  const list  = document.getElementById('timeline-list');
+  const empty = document.getElementById('timeline-empty');
+  const btn   = document.getElementById('btn-iniciar');
+
+  list.innerHTML = '';
+  empty.style.display = selectedIds.length === 0 ? 'block' : 'none';
+  btn.disabled = selectedIds.length === 0;
+  if (selectedIds.length === 0) return;
+
+  let stepNum = 1;
+  TL_STAGE_ORDER.forEach(stageId => {
+    const entries = selectedIds
+      .map((id, idx) => ({ id, idx }))
+      .filter(({ id }) => {
+        const t = TECHNIQUES.find(x => x.id === id);
+        return t && (t.stage || '') === stageId;
+      });
+    if (entries.length === 0) return;
+
+    const group = document.createElement('div');
+    group.className = 'tl-stage-group';
+
+    const header = document.createElement('div');
+    header.className = 'tl-stage-label';
+    header.textContent = TL_STAGE_LABELS[stageId] || stageId;
+    group.appendChild(header);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'tl-stage-items';
+    entries.forEach(({ id, idx }) => {
+      const el = makeTlItem(id, idx, stepNum++);
+      if (el) wrap.appendChild(el);
+    });
+    group.appendChild(wrap);
+    list.appendChild(group);
+  });
+}
+
+function removeTech(id, e) {
+  e.stopPropagation();
+  selectedIds = selectedIds.filter(x => x !== id);
+  renderCatalog();
+  renderTimeline();
+}
+
+// ─── Drag & Drop ───────────────────────────────────────────────────────────
+function tlDragStart(e) {
+  dragSrcIdx = parseInt(e.currentTarget.dataset.idx);
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => e.currentTarget.classList.add('dragging'), 0);
+}
+function tlDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+function tlDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function tlDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  const targetIdx = parseInt(e.currentTarget.dataset.idx);
+  if (dragSrcIdx === null || dragSrcIdx === targetIdx) return;
+  const moved = selectedIds.splice(dragSrcIdx, 1)[0];
+  selectedIds.splice(targetIdx, 0, moved);
+  dragSrcIdx = null;
+  renderTimeline();
+}
+function tlDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.tl-item').forEach(i => i.classList.remove('drag-over'));
+  dragSrcIdx = null;
+}
+function onDragOverZone(e) { e.preventDefault(); document.getElementById('timeline-wrap').classList.add('drag-active'); }
+function onDragLeaveZone(e) { document.getElementById('timeline-wrap').classList.remove('drag-active'); }
+function onDropZone(e) { e.preventDefault(); document.getElementById('timeline-wrap').classList.remove('drag-active'); }
+
+// ─── Start Sprint ──────────────────────────────────────────────────────────
+function iniciarSprint() {
+  if (selectedIds.length === 0) return;
+  const fd = new FormData();
+  fd.append('action', 'start');
+  fd.append('problema',  document.getElementById('inp-problema').value);
+  fd.append('usuario',   document.getElementById('inp-usuario').value);
+  fd.append('dolores',   document.getElementById('inp-dolores').value);
+  fd.append('idea',      document.getElementById('inp-idea').value);
+  fd.append('selected_techniques',     JSON.stringify(selectedIds));
+  fd.append('technique_prompts',       JSON.stringify(techniquePrompts));
+  fd.append('technique_llm_providers', JSON.stringify(techniqueLlmProviders));
+  enviarAlBackend(fd);
+}
+
+// ─── Context chain panel ───────────────────────────────────────────────────
+function renderCtxPanel(currentIdx) {
+  const panel  = document.getElementById('ctx-panel');
+  const chips  = document.getElementById('ctx-chips');
+  const preview = document.getElementById('ctx-preview');
+  const label  = document.getElementById('ctx-toggle-label');
+
+  const prevIds = selectedIds.slice(0, currentIdx).filter(id => allOutputs[id] != null);
+  if (prevIds.length === 0) { panel.style.display = 'none'; return; }
+
+  panel.style.display = 'block';
+  label.textContent = `Contexto anterior (${prevIds.length} técnica${prevIds.length > 1 ? 's' : ''})`;
+
+  chips.innerHTML = '';
+  prevIds.forEach(id => {
+    const t = TECHNIQUES.find(x => x.id === id);
+    const chip = document.createElement('span');
+    chip.className = 'ctx-chip';
+    chip.textContent = `${t?.icon || '⚙️'} ${t?.name || id}`;
+    chips.appendChild(chip);
+  });
+
+  const parts = prevIds.map(id => {
+    const t = TECHNIQUES.find(x => x.id === id);
+    const out = allOutputs[id];
+    const str = typeof out === 'object' ? JSON.stringify(out, null, 2) : String(out);
+    return `[${(t?.name || id).toUpperCase()}]\n${str}`;
+  });
+  preview.textContent = parts.join('\n\n');
+}
+
+function toggleCtx() {
+  const toggle = document.getElementById('ctx-toggle');
+  const body   = document.getElementById('ctx-body');
+  toggle.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+function renderHistory(techId) {
+  const history = techHistory[techId] || [];
+  const attempt = techAttempt[techId] || 1;
+  const badge   = document.getElementById('attempt-badge');
+  const panel   = document.getElementById('history-panel');
+  const label   = document.getElementById('history-label');
+  const list    = document.getElementById('history-list');
+
+  if (attempt > 1) {
+    badge.style.display = 'inline';
+    badge.textContent   = `Intento ${attempt}`;
+  } else {
+    badge.style.display = 'none';
+  }
+
+  if (history.length === 0) { panel.style.display = 'none'; return; }
+
+  panel.style.display = 'block';
+  label.textContent   = `Intentos anteriores (${history.length})`;
+  list.innerHTML      = '';
+
+  history.slice().reverse().forEach((entry, i) => {
+    const n         = history.length - i;
+    const actualIdx = history.length - 1 - i;
+    const div = document.createElement('div');
+    div.style.cssText = 'border:1px solid var(--border); border-radius:8px; padding:12px; background:var(--bg);';
+    div.innerHTML = `
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+        <span style="font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">
+          Intento ${n}
+          ${entry.feedback ? `<span style="color:var(--warning); margin-left:8px;">↺ "${escHtml(entry.feedback.slice(0,60))}${entry.feedback.length>60?'…':''}"</span>` : ''}
+        </span>
+        <button onclick="usarIntento('${techId}', ${actualIdx})"
+          style="font-size:0.72rem; font-weight:700; padding:3px 10px; border-radius:6px; border:1.5px solid var(--success); background:none; color:var(--success); cursor:pointer; white-space:nowrap;"
+          onmouseover="this.style.background='var(--success)';this.style.color='#fff'"
+          onmouseout="this.style.background='none';this.style.color='var(--success)'">
+          ✓ Usar este
+        </button>
+      </div>
+      <div style="font-size:0.82rem; max-height:140px; overflow-y:auto;">${renderOutput(entry.output)}</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function toggleHistory() {
+  document.getElementById('history-toggle').classList.toggle('open');
+  document.getElementById('history-body').classList.toggle('open');
+}
+
+function usarIntento(techId, histIdx) {
+  const entry = (techHistory[techId] || [])[histIdx];
+  if (!entry) return;
+  allOutputs[techId] = entry.output;
+  setOutputBox(entry.output);
+  // Collapse history panel
+  document.getElementById('history-body').classList.remove('open');
+  document.getElementById('history-toggle').classList.remove('open');
+  // Update attempt badge to reflect selection
+  const badge = document.getElementById('attempt-badge');
+  const n = histIdx + 1;
+  badge.style.display = 'inline';
+  badge.textContent = `Usando intento ${n}`;
+}
+
+// ─── Execution screen ──────────────────────────────────────────────────────
+function renderEjecucion(data) {
+  const idx   = data.current_index ?? 0;
+  const total = selectedIds.length;
+  const id    = selectedIds[idx];
+  const tech  = TECHNIQUES.find(t => t.id === id) || { name: id, icon: '⚙️', desc: '' };
+
+  currentTechIdx = idx;
+
+  document.getElementById('exec-icon').textContent        = tech.icon;
+  document.getElementById('exec-nombre').textContent      = tech.name;
+  document.getElementById('exec-descripcion').textContent = tech.desc;
+  document.getElementById('exec-step').textContent        = `Paso ${idx + 1} / ${total}`;
+  document.getElementById('progress-bar').style.width     = `${((idx + 1) / total) * 100}%`;
+
+  renderCtxPanel(idx);
+  showScreen('ejecucion');
+
+  if (data.awaiting_pre_inputs) {
+    if ((TECHNIQUE_QUESTIONNAIRES[id] || []).length === 0) {
+      enviarPreInputs(true);
+      return;
+    }
+    renderPreInputs(id);
+  } else {
+    document.getElementById('pre-inputs-section').style.display = 'none';
+    document.getElementById('output-section').style.display     = 'block';
+    lastFeedback = '';
+
+    const raw = data.output;
+
+    // Track retry history
+    if (raw != null) {
+      if (allOutputs[id] != null) {
+        // This is a retry — save previous output + feedback to history
+        if (!techHistory[id]) techHistory[id] = [];
+        techHistory[id].push({ output: allOutputs[id], feedback: lastFeedback });
+        techAttempt[id] = (techAttempt[id] || 1) + 1;
+      } else {
+        techAttempt[id] = 1;
+      }
+      allOutputs[id] = raw;
+      lastFeedback = '';
+    }
+
+    setOutputBox(raw);
+    renderHistory(id);
+    const hasLlmError = raw && typeof raw === 'object' && raw.llm_error;
+    const btnAprobar = document.querySelector('.btn-success');
+    if (btnAprobar) btnAprobar.disabled = !!hasLlmError;
+  }
+}
+
+function renderPreInputs(techId) {
+  document.getElementById('output-section').style.display     = 'none';
+  document.getElementById('pre-inputs-section').style.display = 'block';
+
+  const questions = TECHNIQUE_QUESTIONNAIRES[techId] || [];
+  const form = document.getElementById('pre-inputs-form');
+  form.innerHTML = '';
+
+  if (questions.length === 0) {
+    form.innerHTML = '<p style="color:var(--text-muted); font-size:0.88rem;">Esta técnica no tiene parámetros adicionales.</p>';
+    return;
+  }
+
+  questions.forEach(q => {
+    const group = document.createElement('div');
+    group.className = 'form-group';
+    group.style.marginBottom = '14px';
+
+    const label = document.createElement('label');
+    label.textContent = q.label;
+    group.appendChild(label);
+
+    let input;
+    if (q.type === 'select') {
+      input = document.createElement('select');
+      input.style.cssText = 'width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:8px; font-size:0.95rem; font-family:inherit; background:#fff;';
+      const emptyOpt = document.createElement('option');
+      emptyOpt.value = '';
+      emptyOpt.textContent = '— Selecciona —';
+      input.appendChild(emptyOpt);
+      (q.options || []).forEach(opt => {
+        const o = document.createElement('option');
+        o.value = opt;
+        o.textContent = opt;
+        input.appendChild(o);
+      });
+    } else if (q.type === 'textarea') {
+      input = document.createElement('textarea');
+      input.rows = 2;
+      input.placeholder = q.placeholder || '';
+    } else {
+      input = document.createElement('input');
+      input.type = q.type;
+      input.placeholder = q.placeholder || '';
+    }
+    input.id = `pre-input-${q.id}`;
+    group.appendChild(input);
+    form.appendChild(group);
+  });
+}
+
+function enviarPreInputs(skip) {
+  const techId    = selectedIds[currentTechIdx];
+  const questions = TECHNIQUE_QUESTIONNAIRES[techId] || [];
+  const extra     = {};
+
+  if (!skip) {
+    questions.forEach(q => {
+      const el = document.getElementById(`pre-input-${q.id}`);
+      if (el && el.value.trim()) extra[q.id] = el.value.trim();
+    });
+  }
+
+  const fd = new FormData();
+  fd.append('action', 'pre_inputs');
+  fd.append('extra_inputs', JSON.stringify(extra));
+  enviarAlBackend(fd);
+}
+
+// ─── Feedback ──────────────────────────────────────────────────────────────
+function enviarFeedback(action, feedbackText) {
+  const txt = feedbackText !== undefined ? feedbackText : '';
+  if (false) { // never block — feedback is always optional
+    return;
+  }
+  lastFeedback = action === 'feedback' ? txt : '';
+  const techId = selectedIds[currentTechIdx];
+  const fd = new FormData();
+  fd.append('action', action);
+  fd.append('feedback', txt);
+  fd.append('current_prompt', techniquePrompts[techId] || '');
+  enviarAlBackend(fd);
+}
+
+// ─── Backend ───────────────────────────────────────────────────────────────
+function enviarAlBackend(fd) {
+  setLoading(true);
+  fetch(window.location.href, {
+    method: 'POST',
+    headers: { 'X-CSRFToken': getCsrf() },
+    body: fd,
+  })
+  .then(r => r.json())
+  .then(res => {
+    setLoading(false);
+    if (res.status === 'success') {
+      procesarRespuesta(res.data);
+    } else {
+      alert('Error: ' + res.message);
+      showScreen('seleccion');
+    }
+  })
+  .catch(err => {
+    setLoading(false);
+    console.error(err);
+    alert('Error de conexión con el servidor.');
+  });
+}
+
+function procesarRespuesta(data) {
+  if (data.estado === 'END' || data.estado === '__end__' || !data.estado) {
+    // Collect any final outputs from backend before rendering summary
+    if (data.all_outputs) {
+      Object.assign(allOutputs, data.all_outputs);
+    }
+    renderFinal();
+    return;
+  }
+  renderEjecucion(data);
+}
+
+// ─── Final screen ──────────────────────────────────────────────────────────
+function renderFinal() {
+  const grid = document.getElementById('results-grid');
+  grid.innerHTML = '';
+  Object.entries(allOutputs).forEach(([id, out]) => {
+    const t = TECHNIQUES.find(x => x.id === id) || { name: id, icon: '⚙️' };
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    card.innerHTML = `<h4>${t.icon} ${escHtml(t.name)}</h4><div class="result-body">${renderOutput(out)}</div>`;
+    grid.appendChild(card);
+  });
+  showScreen('final');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── Output renderer ───────────────────────────────────────────────────────
+let _currentOutputRaw = null;
+let _showingJson = false;
+
+function renderValue(val, depth) {
+  if (val == null) return '<span class="out-empty">—</span>';
+  if (typeof val === 'boolean') return `<span class="out-text">${val ? 'Sí' : 'No'}</span>`;
+  if (typeof val === 'number') return `<span class="out-text">${val}</span>`;
+  if (typeof val === 'string') {
+    if (!val.trim()) return '<span class="out-empty">—</span>';
+    return `<p class="out-text">${escHtml(val)}</p>`;
+  }
+  if (Array.isArray(val)) {
+    if (val.length === 0) return '<span class="out-empty">—</span>';
+    if (val.every(v => typeof v === 'string' || typeof v === 'number')) {
+      return `<ul class="out-list">${val.map(v => `<li class="out-list-item">${escHtml(String(v))}</li>`).join('')}</ul>`;
+    }
+    return `<ul class="out-list">${val.map(v =>
+      `<li class="out-list-item">${typeof v === 'object' ? renderObj(v, depth + 1) : escHtml(String(v))}</li>`
+    ).join('')}</ul>`;
+  }
+  if (typeof val === 'object') return depth < 2 ? renderObj(val, depth + 1) : `<pre class="out-raw">${escHtml(JSON.stringify(val, null, 2))}</pre>`;
+  return `<p class="out-text">${escHtml(String(val))}</p>`;
+}
+
+function renderObj(obj, depth) {
+  const wrap = depth > 0 ? 'out-nested' : '';
+  const inner = Object.entries(obj).map(([k, v]) => {
+    const label = k.replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+    return `<div class="out-section"><div class="out-key">${escHtml(label)}</div>${renderValue(v, depth)}</div>`;
+  }).join('');
+  return wrap ? `<div class="${wrap}">${inner}</div>` : inner;
+}
+
+function renderOutput(raw) {
+  if (raw == null) return '<span class="out-empty" style="color:var(--text-muted);font-style:italic;">Sin datos</span>';
+  if (typeof raw === 'object' && raw.llm_error) {
+    return `<div style="background:#fff5f5;border:1.5px solid #fca5a5;border-radius:8px;padding:14px 16px;color:#b91c1c;">
+      <strong>⚠️ Error del modelo LLM (${escHtml(raw.provider || '?')})</strong><br>
+      <span style="font-size:0.85rem;display:block;margin-top:6px;">${escHtml(raw.message || 'Error desconocido')}</span>
+      <span style="font-size:0.78rem;color:#999;display:block;margin-top:8px;">Puedes reintentar cambiando el modelo en el prompt o añadiendo feedback.</span>
+    </div>`;
+  }
+  if (typeof raw === 'object' && !Array.isArray(raw)) return renderObj(raw, 0);
+  if (Array.isArray(raw)) return renderValue(raw, 0);
+  return `<pre class="out-raw">${escHtml(String(raw))}</pre>`;
+}
+
+function setOutputBox(raw) {
+  _currentOutputRaw = raw;
+  _showingJson = false;
+  const btn = document.getElementById('btn-toggle-json');
+  if (btn) btn.textContent = '{ } JSON';
+  document.getElementById('output-box').innerHTML = renderOutput(raw);
+}
+
+function toggleJsonView() {
+  if (_currentOutputRaw == null) return;
+  _showingJson = !_showingJson;
+  const btn = document.getElementById('btn-toggle-json');
+  if (_showingJson) {
+    const str = typeof _currentOutputRaw === 'object'
+      ? JSON.stringify(_currentOutputRaw, null, 2) : String(_currentOutputRaw);
+    document.getElementById('output-box').innerHTML = `<pre class="out-raw">${escHtml(str)}</pre>`;
+    btn.textContent = '⊞ Legible';
+  } else {
+    document.getElementById('output-box').innerHTML = renderOutput(_currentOutputRaw);
+    btn.textContent = '{ } JSON';
+  }
+}
+
+// ─── Corregir modal (feedback + prompt unificados) ─────────────────────────
+function abrirCorregir() {
+  const id = selectedIds[currentTechIdx];
+  editingPromptId = id;
+  document.getElementById('corr-feedback').value = lastFeedback || '';
+  document.getElementById('corr-prompt').value = techniquePrompts[id] || '';
+  // Collapse prompt section by default
+  document.getElementById('corr-prompt-section').style.display = 'none';
+  document.getElementById('corr-prompt-toggle-icon').textContent = '▶';
+  document.getElementById('corregir-modal').style.display = 'flex';
+}
+
+function cerrarCorregir() {
+  document.getElementById('corregir-modal').style.display = 'none';
+  editingPromptId = null;
+}
+
+function onCorregirOverlay(e) {
+  if (e.target === document.getElementById('corregir-modal')) cerrarCorregir();
+}
+
+function togglePromptSection() {
+  const sec = document.getElementById('corr-prompt-section');
+  const ico = document.getElementById('corr-prompt-toggle-icon');
+  const open = sec.style.display === 'none';
+  sec.style.display = open ? 'block' : 'none';
+  ico.textContent = open ? '▼' : '▶';
+}
+
+function confirmarCorreccion() {
+  const id = selectedIds[currentTechIdx];
+  const feedback = document.getElementById('corr-feedback').value.trim();
+  const promptVal = document.getElementById('corr-prompt').value.trim();
+  if (promptVal) techniquePrompts[id] = promptVal;
+  else delete techniquePrompts[id];
+  cerrarCorregir();
+  enviarFeedback('feedback', feedback);
+}
+
+// ─── New technique modal ────────────────────────────────────────────────────
+function abrirModalNuevaTech() {
+  ['nt-name','nt-id','nt-inputs','nt-outputs','nt-prompt'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('nt-icon').value = '⚙️';
+  document.getElementById('nt-stage').value = '';
+  document.getElementById('nt-questions').innerHTML = '';
+  document.getElementById('new-tech-modal').style.display = 'flex';
+}
+
+function cerrarModalNuevaTech() {
+  document.getElementById('new-tech-modal').style.display = 'none';
+}
+
+function addQuestion(q) {
+  const container = document.getElementById('nt-questions');
+  const row = document.createElement('div');
+  row.style.cssText = 'display:grid; grid-template-columns:120px 1fr 110px 1fr 28px; gap:6px; align-items:center;';
+  row.innerHTML = `
+    <input type="text" placeholder="id (slug)" value="${q?.id||''}"
+      style="padding:6px 8px; border:1.5px solid var(--border); border-radius:6px; font-size:0.82rem; font-family:monospace;"
+      class="q-id">
+    <input type="text" placeholder="Etiqueta" value="${q?.label||''}"
+      style="padding:6px 8px; border:1.5px solid var(--border); border-radius:6px; font-size:0.82rem;"
+      class="q-label">
+    <select class="q-type" onchange="toggleQExtra(this)"
+      style="padding:6px 8px; border:1.5px solid var(--border); border-radius:6px; font-size:0.82rem; background:#fff;">
+      <option value="text" ${q?.type==='text'?'selected':''}>Texto</option>
+      <option value="textarea" ${q?.type==='textarea'?'selected':''}>Área</option>
+      <option value="number" ${q?.type==='number'?'selected':''}>Número</option>
+      <option value="select" ${q?.type==='select'?'selected':''}>Selección</option>
+    </select>
+    <input type="text" class="q-extra"
+      placeholder="${q?.type==='select' ? 'Opciones separadas por coma' : 'Placeholder'}"
+      value="${q?.type==='select' ? (q?.options||[]).join(', ') : (q?.placeholder||'')}"
+      style="padding:6px 8px; border:1.5px solid var(--border); border-radius:6px; font-size:0.82rem;">
+    <button type="button" onclick="this.closest('div').remove()"
+      style="background:none; border:none; color:#ccc; cursor:pointer; font-size:1.1rem; line-height:1;">×</button>
+  `;
+  container.appendChild(row);
+}
+
+function toggleQExtra(sel) {
+  const extra = sel.closest('div').querySelector('.q-extra');
+  extra.placeholder = sel.value === 'select' ? 'Opciones separadas por coma' : 'Placeholder';
+  extra.value = '';
+}
+
+function onNtOverlayClick(e) {
+  if (e.target === document.getElementById('new-tech-modal')) cerrarModalNuevaTech();
+}
+
+function autoNtId() {
+  const name = document.getElementById('nt-name').value;
+  const slug = name.toLowerCase().trim()
+    .replace(/[áàäâ]/g,'a').replace(/[éèëê]/g,'e')
+    .replace(/[íìïî]/g,'i').replace(/[óòöô]/g,'o')
+    .replace(/[úùüû]/g,'u').replace(/ñ/g,'n')
+    .replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+  document.getElementById('nt-id').value = slug;
+}
+
+async function guardarNuevaTech() {
+  const name    = document.getElementById('nt-name').value.trim();
+  const icon    = document.getElementById('nt-icon').value.trim() || '⚙️';
+  const tech_id = document.getElementById('nt-id').value.trim();
+  const inputs_description  = document.getElementById('nt-inputs').value.trim();
+  const outputs_description = document.getElementById('nt-outputs').value.trim();
+  const default_prompt      = document.getElementById('nt-prompt').value.trim();
+
+  if (!name || !tech_id || !default_prompt) {
+    alert('Nombre, ID y prompt son obligatorios.');
+    return;
+  }
+  if (TECHNIQUES.some(t => t.id === tech_id)) {
+    alert(`Ya existe una técnica con ID "${tech_id}".`);
+    return;
+  }
+
+  const stage = document.getElementById('nt-stage').value;
+
+  const questionnaire = [];
+  document.querySelectorAll('#nt-questions > div').forEach(row => {
+    const id   = row.querySelector('.q-id').value.trim();
+    const label = row.querySelector('.q-label').value.trim();
+    const type  = row.querySelector('.q-type').value;
+    const extra = row.querySelector('.q-extra').value.trim();
+    if (!id || !label) return;
+    const q = { id, label, type };
+    if (type === 'select') q.options = extra.split(',').map(s => s.trim()).filter(Boolean);
+    else q.placeholder = extra;
+    questionnaire.push(q);
+  });
+
+  const res = await fetch('/sprint/techniques/create/', {
+    method: 'POST',
+    headers: { 'X-CSRFToken': getCsrf(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, icon, tech_id, stage, inputs_description, outputs_description, default_prompt, questionnaire }),
+  });
+  const data = await res.json();
+  if (data.error) { alert(data.error); return; }
+
+  TECHNIQUES.push({ id: tech_id, name, icon, stage: stage || '', desc: inputs_description, inputs: inputs_description, outputs: outputs_description, isCustom: true, questionnaire });
+  TECHNIQUE_QUESTIONNAIRES[tech_id] = questionnaire;
+  renderCatalog();
+  cerrarModalNuevaTech();
+}
+
+async function eliminarTech(techId, e) {
+  e.stopPropagation();
+  if (!confirm(`¿Eliminar la técnica "${techId}"?`)) return;
+  const res = await fetch(`/sprint/techniques/${techId}/delete/`, {
+    method: 'DELETE',
+    headers: { 'X-CSRFToken': getCsrf() },
+  });
+  const data = await res.json();
+  if (data.error) { alert(data.error); return; }
+  const i = TECHNIQUES.findIndex(t => t.id === techId);
+  if (i !== -1) TECHNIQUES.splice(i, 1);
+  selectedIds = selectedIds.filter(id => id !== techId);
+  renderCatalog();
+  renderTimeline();
+}
+
+// ─── Simulate modal ────────────────────────────────────────────────────────
+function abrirSimular() {
+  const techId = selectedIds[currentTechIdx];
+  if (!techId || !allOutputs || !allOutputs[techId]) {
+    alert('Ejecuta primero la técnica para tener un resultado que simular.');
+    return;
+  }
+  const simModal = document.getElementById('sim-modal');
+  document.getElementById('sim-status').style.display = 'block';
+  document.getElementById('sim-status').textContent = 'Haz clic en «Simular» para generar las respuestas.';
+  document.getElementById('sim-output-box').style.display = 'none';
+  document.getElementById('sim-run-btn').disabled = false;
+  simModal.style.display = 'flex';
+}
+
+function cerrarSimular(e) {
+  if (!e || e.target === document.getElementById('sim-modal')) {
+    document.getElementById('sim-modal').style.display = 'none';
+  }
+}
+
+async function ejecutarSimulacion() {
+  const techId = selectedIds[currentTechIdx];
+  if (!techId) return;
+  const output = allOutputs[techId];
+  const problema = document.getElementById('inp-problema').value;
+  const usuario  = document.getElementById('inp-usuario').value;
+
+  document.getElementById('sim-run-btn').disabled = true;
+  document.getElementById('sim-status').style.display = 'block';
+  document.getElementById('sim-status').textContent = 'Generando simulación…';
+  document.getElementById('sim-output-box').style.display = 'none';
+
+  try {
+    const res = await fetch(`/sprint/techniques/${techId}/simulate/`, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCsrf(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ output, problem_definition: problema, target_user: usuario }),
+    });
+    const data = await res.json();
+    document.getElementById('sim-status').style.display = 'none';
+    const box = document.getElementById('sim-output-box');
+    box.style.display = 'block';
+    if (data.error) {
+      box.innerHTML = `<span style="color:var(--danger);">Error: ${escHtml(data.error)}</span>`;
+    } else {
+      box.innerHTML = renderOutput(data.output);
+    }
+  } catch (err) {
+    document.getElementById('sim-status').textContent = 'Error de conexión.';
+  } finally {
+    document.getElementById('sim-run-btn').disabled = false;
+  }
+}
+
+// ─── Init — restore or start fresh ────────────────────────────────────────
+const EXISTING_STATE = {{ existing_state|safe }};
+
+if (EXISTING_STATE && EXISTING_STATE.selected_techniques && EXISTING_STATE.selected_techniques.length > 0) {
+  selectedIds = EXISTING_STATE.selected_techniques;
+  allOutputs  = EXISTING_STATE.all_outputs || {};
+  renderStagePills();
+
+  document.getElementById('inp-problema').value = EXISTING_STATE.problem_definition || '';
+  document.getElementById('inp-usuario').value  = EXISTING_STATE.target_user        || '';
+  document.getElementById('inp-dolores').value  = EXISTING_STATE.pain_points        || '';
+  document.getElementById('inp-idea').value     = EXISTING_STATE.initial_idea       || '';
+
+  const s = EXISTING_STATE.estado;
+  if (!s || s === 'END' || s === '__end__') {
+    renderFinal();
+  } else {
+    renderEjecucion(EXISTING_STATE);
+  }
+} else {
+  showScreen('contexto');
+}
+</script>
 {% endblock %}

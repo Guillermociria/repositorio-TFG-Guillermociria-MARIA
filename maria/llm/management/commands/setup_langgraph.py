@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from llm.services import pool
+from llm.services import get_pool
 from langgraph.checkpoint.postgres import PostgresSaver
 
 class Command(BaseCommand):
@@ -7,7 +7,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         self.stdout.write("Configurando tablas de LangGraph...")
-        
+        pool = get_pool()
         try:
             saver = PostgresSaver(pool)
             saver.setup()

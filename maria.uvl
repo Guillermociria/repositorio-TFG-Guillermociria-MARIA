@@ -1,0 +1,110 @@
+namespace MARIA
+
+features
+  MARIA
+    mandatory
+      SprintSession
+      TechniquesCatalog
+
+  SprintSession
+    mandatory
+      ProblemDefinition
+      TargetUser
+    optional
+      PainPoints
+      InitialIdea
+      Stages
+      LLMConfiguration
+    or
+      Techniques
+
+  Stages
+    or
+      Empatizar
+      Definir
+      Idear
+      Prototipar
+      Testear
+
+  Techniques
+    or
+      // Empatizar
+      MapaEmpatia
+      Entrevistas
+      CustomerJourney
+      // Definir
+      LongTermGoal
+      SprintQuestions
+      HowMightWe
+      POV
+      // Idear
+      Brainstorming
+      // Prototipar
+      Prototipado
+      Map
+      GenerateMap
+      // Testear
+      Testing
+
+  TechniquesCatalog
+    or
+      BuiltinTechnique
+      CustomTechnique
+
+  BuiltinTechnique
+    mandatory
+      BuiltinPrompt
+    optional
+      Questionnaire
+
+  CustomTechnique
+    mandatory
+      CustomPromptText
+      TechId
+    optional
+      StageAssignment
+      Questionnaire
+
+  Questionnaire
+    or
+      TextQuestion
+      TextareaQuestion
+      NumberQuestion
+      SelectQuestion
+
+  LLMConfiguration
+    alternative
+      GoogleGemini
+      OpenAIGPT
+      AnthropicClaude
+
+  GoogleGemini
+    mandatory
+      GoogleApiKey
+
+  OpenAIGPT
+    mandatory
+      OpenAIApiKey
+
+  AnthropicClaude
+    mandatory
+      AnthropicApiKey
+
+constraints
+  SprintQuestions => LongTermGoal
+  Map => LongTermGoal
+  Map => SprintQuestions
+  GenerateMap => Map
+  MapaEmpatia => Empatizar
+  Entrevistas => Empatizar
+  CustomerJourney => Empatizar
+  LongTermGoal => Definir
+  SprintQuestions => Definir
+  HowMightWe => Definir
+  POV => Definir
+  Brainstorming => Idear
+  Prototipado => Prototipar
+  Map => Prototipar
+  GenerateMap => Prototipar
+  Testing => Testear
+  CustomTechnique => !BuiltinTechnique

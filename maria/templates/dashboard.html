@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+{% block title %}Mis sesiones{% endblock %}
+
+{% block extra_css %}
+<style>
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+}
+.dashboard-header h2 {
+    font-size: 20px;
+    color: var(--dark);
+}
+.sessions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+}
+.session-card {
+    background: white;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    padding: 22px;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.2s, border-color 0.2s;
+    display: block;
+}
+.session-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    border-color: var(--primary);
+}
+.session-card h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: var(--dark);
+}
+.session-card p {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 14px;
+    min-height: 36px;
+}
+.session-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: #aaa;
+}
+.badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.badge-active { background: #e8f5e9; color: #2e7d32; }
+.badge-completed { background: #f3e5f5; color: #6a1b9a; }
+.session-card-wrap { position: relative; }
+.btn-export {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: #888;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s;
+    z-index: 1;
+}
+.btn-export:hover { border-color: var(--primary); color: var(--primary); }
+.btn-delete {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: #ccc;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+    z-index: 1;
+}
+.btn-delete:hover { border-color: #ef4444; color: #ef4444; }
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #aaa;
+}
+.empty-state p { font-size: 15px; margin-bottom: 20px; }
+
+/* Modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+    background: white;
+    border-radius: 10px;
+    padding: 36px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+.modal h3 {
+    font-size: 18px;
+    margin-bottom: 22px;
+    color: var(--tertiary);
+}
+.form-group {
+    margin-bottom: 16px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--dark);
+}
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: vertical;
+}
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--primary);
+}
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    justify-content: flex-end;
+}
+.btn-ghost {
+    background: none;
+    border: 1px solid #ddd;
+    color: #666;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.btn-ghost:hover { border-color: #bbb; }
+.stages-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+}
+.stage-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1.5px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s;
+    user-select: none;
+}
+.stage-chip:hover { border-color: var(--primary); }
+.stage-chip input[type=checkbox] { display: none; }
+.stage-chip.checked {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h2>Mis sesiones de Design Sprint</h2>
+    <button class="btn" onclick="openModal()">+ Nueva sesión</button>
+</div>
+
+{% if sessions %}
+<div class="sessions-grid">
+    {% for s in sessions %}
+    <div class="session-card-wrap">
+        <a class="session-card" href="{% url 'sprint_session' s.pk %}">
+            <h3>{{ s.name }}</h3>
+            <p>{{ s.description|default:"Sin descripción" }}</p>
+            <div class="session-meta">
+                <span>{{ s.created_at|date:"d/m/Y" }}</span>
+                <span class="badge badge-{{ s.status }}">{{ s.get_status_display }}</span>
+            </div>
+        </a>
+        <a class="btn-export" href="{% url 'export_session' s.pk %}" title="Exportar JSON">⬇ JSON</a>
+        <button class="btn-delete" onclick="deleteSession(event, {{ s.pk }}, '{{ s.name|escapejs }}')" title="Eliminar sesión">🗑</button>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p>No tienes sesiones todavía.</p>
+    <button class="btn" onclick="openModal()">Crear primera sesión</button>
+</div>
+{% endif %}
+
+<!-- Modal nueva sesión -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeOnOverlay(event)">
+    <div class="modal">
+        <h3>Nueva sesión</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Nombre *</label>
+                <input type="text" id="name" name="name" placeholder="Ej: Sprint producto X" required autofocus>
+            </div>
+            <div class="form-group">
+                <label for="description">Descripción</label>
+                <textarea id="description" name="description" rows="3" placeholder="Objetivo o contexto del sprint..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Fases del Design Thinking</label>
+                <div class="stages-grid">
+                    <label class="stage-chip checked" onclick="toggleStage(this)">
+                        <input type="checkbox" name="stages" value="empatizar" checked>
+                        🔍 Empatizar
+                    </label>
+                    <label class="stage-chip checked" onclick="toggleStage(this)">
+                        <input type="checkbox" name="stages" value="definir" checked>
+                        🎯 Definir
+                    </label>
+                    <label class="stage-chip checked" onclick="toggleStage(this)">
+                        <input type="checkbox" name="stages" value="idear" checked>
+                        💡 Idear
+                    </label>
+                    <label class="stage-chip checked" onclick="toggleStage(this)">
+                        <input type="checkbox" name="stages" value="prototipar" checked>
+                        🛠️ Prototipar
+                    </label>
+                    <label class="stage-chip checked" onclick="toggleStage(this)">
+                        <input type="checkbox" name="stages" value="testear" checked>
+                        🧪 Testear
+                    </label>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-ghost" onclick="closeModal()">Cancelar</button>
+                <button type="submit" class="btn">Crear sesión</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openModal() {
+    document.getElementById('modalOverlay').classList.add('open');
+    document.getElementById('name').focus();
+}
+function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+}
+function closeOnOverlay(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+function toggleStage(label) {
+    const cb = label.querySelector('input[type=checkbox]');
+    cb.checked = !cb.checked;
+    label.classList.toggle('checked', cb.checked);
+}
+
+const getCsrf = () =>
+    document.cookie.match(/csrftoken=([^;]+)/)?.[1] ||
+    document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+
+async function deleteSession(e, id, name) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirm(`¿Eliminar la sesión "${name}"? Esta acción no se puede deshacer.`)) return;
+    const res = await fetch(`/sprint/${id}/delete/`, {
+        method: 'DELETE',
+        headers: { 'X-CSRFToken': getCsrf() },
+    });
+    const data = await res.json();
+    if (data.ok) {
+        e.target.closest('.session-card-wrap')?.remove();
+    } else {
+        alert('Error al eliminar la sesión.');
+    }
+}
+</script>
+{% endblock %}

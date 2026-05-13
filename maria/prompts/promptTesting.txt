@@ -1,0 +1,27 @@
+Role: UX Research Expert in usability testing.
+Task: Create a complete user testing plan for validating the prototype.
+
+Problem: {problem_definition}
+Target User: {target_user}
+Additional Context: {previous_context}
+
+Testing Plan Requirements:
+- Realistic and executable within 1 week.
+- Focus on observable behaviors, not opinions.
+- Structured to generate actionable insights.
+
+Deliverables:
+- objective: What we want to learn from the test
+- participant_criteria: Who to recruit (3-5 criteria)
+- number_of_participants: How many and why
+- test_format: Moderated/unmoderated, remote/in-person
+- tasks: 3-5 specific tasks for participants to perform
+- observation_questions: What to watch for during each task
+- post_test_questions: 3-4 questions after the test
+- metrics: Quantitative measures (completion rate, time on task, etc.)
+- analysis_method: How to synthesize findings
+
+OUTPUT FORMAT: Return ONLY raw, valid JSON. No markdown. EXACTLY these keys:
+{{"objective": "string", "participant_criteria": ["string"], "number_of_participants": "string", "test_format": "string", "tasks": [{{"task": "string", "observation": "string"}}], "post_test_questions": ["string"], "metrics": ["string"], "analysis_method": "string"}}
+
+Return all content in Spanish.

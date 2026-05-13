@@ -1,0 +1,392 @@
+{% extends "base.html" %}
+{% block title %}Catálogo de técnicas{% endblock %}
+
+{% block extra_css %}
+<style>
+.catalog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+}
+.catalog-header h2 { font-size: 20px; color: var(--dark); }
+
+.stage-section { margin-bottom: 32px; }
+.stage-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #888;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+}
+.tech-card {
+    background: white;
+    border: 1.5px solid #e8e8e8;
+    border-radius: 10px;
+    padding: 18px;
+    position: relative;
+    transition: box-shadow 0.15s, border-color 0.15s;
+}
+.tech-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.08); border-color: #ccc; }
+.tech-card.custom { border-color: #c7d2fe; }
+.tc-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.tc-name { font-weight: 700; font-size: 0.92rem; margin-bottom: 10px; color: var(--dark); }
+.tc-label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
+.tc-val { font-size: 0.78rem; color: #555; margin-bottom: 8px; line-height: 1.4; }
+.tc-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: #f3f4f4;
+    color: #888;
+}
+.tc-badge.custom-badge { background: #eef2ff; color: #4f46e5; }
+.tc-delete {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #ccc;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: color 0.15s;
+}
+.tc-delete:hover { color: #ef4444; }
+
+/* Modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 100;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-y: auto;
+    padding: 32px 16px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+    background: white;
+    border-radius: 10px;
+    padding: 32px;
+    width: 100%;
+    max-width: 640px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    margin: auto;
+}
+.modal h3 { font-size: 18px; margin-bottom: 6px; color: var(--tertiary); }
+.modal-sub { font-size: 13px; color: #888; margin-bottom: 20px; }
+.form-group { margin-bottom: 16px; }
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--dark);
+}
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: vertical;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus { border-color: var(--primary); }
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+.btn-ghost {
+    background: none;
+    border: 1px solid #ddd;
+    color: #666;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.btn-ghost:hover { border-color: #bbb; }
+code { font-family: monospace; font-size: 0.85em; background: #f3f4f4; padding: 1px 4px; border-radius: 3px; }
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #aaa;
+    font-size: 14px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="catalog-header">
+    <h2>Catálogo de técnicas</h2>
+    {% if user.is_staff %}
+    <button class="btn" onclick="abrirModal()">+ Nueva técnica</button>
+    {% endif %}
+</div>
+
+{% regroup techniques by stage as by_stage %}
+
+{% for stage_group in by_stage %}
+<div class="stage-section">
+    <div class="stage-title">
+        {% if stage_group.grouper == 'empatizar' %}🔍 Empatizar
+        {% elif stage_group.grouper == 'definir' %}🎯 Definir
+        {% elif stage_group.grouper == 'idear' %}💡 Idear
+        {% elif stage_group.grouper == 'prototipar' %}🛠️ Prototipar
+        {% elif stage_group.grouper == 'testear' %}🧪 Testear
+        {% elif stage_group.grouper == '' %}⚙️ Sin fase asignada
+        {% else %}{{ stage_group.grouper }}
+        {% endif %}
+    </div>
+    <div class="tech-grid">
+        {% for t in stage_group.list %}
+        <div class="tech-card {% if not t.is_builtin %}custom{% endif %}" id="card-{{ t.tech_id }}">
+            {% if not t.is_builtin and user.is_staff %}
+            <button class="tc-delete" onclick="eliminarTech('{{ t.tech_id }}', '{{ t.name }}')" title="Eliminar">🗑</button>
+            {% endif %}
+            <div class="tc-icon">{{ t.icon }}</div>
+            <div class="tc-name">{{ t.name }}</div>
+            <div class="tc-label">Entrada</div>
+            <div class="tc-val">{{ t.inputs_description|default:"—" }}</div>
+            <div class="tc-label">Salida</div>
+            <div class="tc-val">{{ t.outputs_description|default:"—" }}</div>
+            <span class="tc-badge {% if not t.is_builtin %}custom-badge{% endif %}">
+                {% if t.is_builtin %}Sistema{% else %}Personalizada{% endif %}
+            </span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% empty %}
+<div class="empty-state">
+    No hay técnicas en el catálogo. Ejecuta <code>python manage.py seed_techniques</code> para cargar las predefinidas.
+</div>
+{% endfor %}
+
+<!-- Modal nueva técnica -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeOnOverlay(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+        <h3>Nueva técnica personalizada</h3>
+        <p class="modal-sub">
+            Usa <code>{problem_definition}</code>, <code>{target_user}</code>,
+            <code>{pain_points}</code>, <code>{initial_idea}</code>,
+            <code>{previous_context}</code> en el prompt. Devuelve siempre JSON válido.
+        </p>
+        <div style="display:flex; gap:12px;">
+            <div class="form-group" style="flex:0 0 70px;">
+                <label>Emoji</label>
+                <input id="nt-icon" type="text" maxlength="4" placeholder="⚙️"
+                    style="text-align:center; font-size:1.3rem; padding:6px;">
+            </div>
+            <div class="form-group" style="flex:1;">
+                <label>Nombre *</label>
+                <input id="nt-name" type="text" placeholder="Ej: Análisis de competidores" oninput="autoId()">
+            </div>
+            <div class="form-group" style="flex:0 0 180px;">
+                <label>ID (slug) *</label>
+                <input id="nt-id" type="text" placeholder="analisis_competidores"
+                    style="font-family:monospace; font-size:0.85rem;">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Fase</label>
+            <select id="nt-stage">
+                <option value="">— Sin asignar —</option>
+                <option value="empatizar">🔍 Empatizar</option>
+                <option value="definir">🎯 Definir</option>
+                <option value="idear">💡 Idear</option>
+                <option value="prototipar">🛠️ Prototipar</option>
+                <option value="testear">🧪 Testear</option>
+            </select>
+        </div>
+        <div style="display:flex; gap:12px;">
+            <div class="form-group" style="flex:1;">
+                <label>Descripción de entradas</label>
+                <input id="nt-inputs" type="text" placeholder="Ej: Problema, usuario objetivo">
+            </div>
+            <div class="form-group" style="flex:1;">
+                <label>Descripción de salidas</label>
+                <input id="nt-outputs" type="text" placeholder="Ej: Análisis con gaps">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Prompt por defecto *</label>
+            <textarea id="nt-prompt" rows="7"
+                style="font-family:monospace; font-size:0.82rem;"
+                placeholder="Eres un experto en...&#10;Problema: {problem_definition}&#10;&#10;OUTPUT FORMAT: Devuelve SOLO JSON válido. Sin markdown."></textarea>
+        </div>
+
+        <!-- Questionnaire builder -->
+        <div style="margin-bottom:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                <label style="font-weight:600; font-size:13px; color:var(--dark); margin:0;">
+                    Preguntas del formulario previo
+                    <span style="font-weight:400; color:#aaa;">(opcional)</span>
+                </label>
+                <button type="button" class="btn" style="padding:4px 12px; font-size:12px;" onclick="addQuestion()">+ Añadir pregunta</button>
+            </div>
+            <div id="nt-questions" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-ghost" onclick="cerrarModal()">Cancelar</button>
+            <button class="btn" onclick="guardar()">Guardar técnica</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const getCsrf = () =>
+    document.cookie.match(/csrftoken=([^;]+)/)?.[1] ||
+    document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+
+const STAGE_LABELS = {
+    empatizar: '🔍 Empatizar', definir: '🎯 Definir',
+    idear: '💡 Idear', prototipar: '🛠️ Prototipar', testear: '🧪 Testear',
+};
+const STAGE_ORDER = ['empatizar', 'definir', 'idear', 'prototipar', 'testear', ''];
+
+function abrirModal() {
+    ['nt-name','nt-id','nt-inputs','nt-outputs','nt-prompt'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    document.getElementById('nt-icon').value = '⚙️';
+    document.getElementById('nt-stage').value = '';
+    document.getElementById('nt-questions').innerHTML = '';
+    document.getElementById('modalOverlay').classList.add('open');
+}
+
+function addQuestion() {
+    const container = document.getElementById('nt-questions');
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid; grid-template-columns:110px 1fr 100px 1fr 26px; gap:6px; align-items:center;';
+    row.innerHTML = `
+        <input type="text" placeholder="id (slug)" class="q-id"
+            style="padding:6px 8px; border:1px solid #ddd; border-radius:6px; font-size:0.8rem; font-family:monospace;">
+        <input type="text" placeholder="Etiqueta" class="q-label"
+            style="padding:6px 8px; border:1px solid #ddd; border-radius:6px; font-size:0.8rem;">
+        <select class="q-type" onchange="toggleQExtra(this)"
+            style="padding:6px 8px; border:1px solid #ddd; border-radius:6px; font-size:0.8rem; background:#fff;">
+            <option value="text">Texto</option>
+            <option value="textarea">Área</option>
+            <option value="number">Número</option>
+            <option value="select">Selección</option>
+        </select>
+        <input type="text" class="q-extra" placeholder="Placeholder"
+            style="padding:6px 8px; border:1px solid #ddd; border-radius:6px; font-size:0.8rem;">
+        <button type="button" onclick="this.closest('div').remove()"
+            style="background:none; border:none; color:#ccc; cursor:pointer; font-size:1.1rem; line-height:1; padding:0;">×</button>
+    `;
+    container.appendChild(row);
+}
+
+function toggleQExtra(sel) {
+    const extra = sel.closest('div').querySelector('.q-extra');
+    extra.placeholder = sel.value === 'select' ? 'Opciones separadas por coma' : 'Placeholder';
+    extra.value = '';
+}
+function cerrarModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+}
+function closeOnOverlay(e) {
+    if (e.target === document.getElementById('modalOverlay')) cerrarModal();
+}
+
+function autoId() {
+    const name = document.getElementById('nt-name').value;
+    const slug = name.toLowerCase().trim()
+        .replace(/[áàäâ]/g,'a').replace(/[éèëê]/g,'e')
+        .replace(/[íìïî]/g,'i').replace(/[óòöô]/g,'o')
+        .replace(/[úùüû]/g,'u').replace(/ñ/g,'n')
+        .replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+    document.getElementById('nt-id').value = slug;
+}
+
+async function guardar() {
+    const name    = document.getElementById('nt-name').value.trim();
+    const tech_id = document.getElementById('nt-id').value.trim();
+    const prompt  = document.getElementById('nt-prompt').value.trim();
+    if (!name || !tech_id || !prompt) {
+        alert('Nombre, ID y prompt son obligatorios.');
+        return;
+    }
+    const questionnaire = [];
+    document.querySelectorAll('#nt-questions > div').forEach(row => {
+        const id    = row.querySelector('.q-id').value.trim();
+        const label = row.querySelector('.q-label').value.trim();
+        const type  = row.querySelector('.q-type').value;
+        const extra = row.querySelector('.q-extra').value.trim();
+        if (!id || !label) return;
+        const q = { id, label, type };
+        if (type === 'select') q.options = extra.split(',').map(s => s.trim()).filter(Boolean);
+        else q.placeholder = extra;
+        questionnaire.push(q);
+    });
+
+    const payload = {
+        name,
+        tech_id,
+        icon:                document.getElementById('nt-icon').value.trim() || '⚙️',
+        stage:               document.getElementById('nt-stage').value,
+        inputs_description:  document.getElementById('nt-inputs').value.trim(),
+        outputs_description: document.getElementById('nt-outputs').value.trim(),
+        default_prompt:      prompt,
+        questionnaire,
+    };
+    const res  = await fetch('/sprint/techniques/create/', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': getCsrf(), 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (data.error) { alert(data.error); return; }
+
+    location.reload();
+}
+
+async function eliminarTech(techId, name) {
+    if (!confirm(`¿Eliminar la técnica "${name}"?`)) return;
+    const res  = await fetch(`/sprint/techniques/${techId}/delete/`, {
+        method: 'DELETE',
+        headers: { 'X-CSRFToken': getCsrf() },
+    });
+    const data = await res.json();
+    if (data.error) { alert(data.error); return; }
+    document.getElementById('card-' + techId)?.remove();
+}
+</script>
+{% endblock %}
