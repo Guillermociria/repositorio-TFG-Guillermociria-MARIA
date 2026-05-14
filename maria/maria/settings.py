@@ -26,8 +26,11 @@ SECRET_KEY = 'django-insecure-ltudau&u&7wx6*pav&q)yy=l@3ncys+9&%i=w1+l%2q1q0($=h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['mariaTFGdemo.duckdns.org']
 
+CSRF_TRUSTED_ORIGINS = [
+	'https://mariatfgdemo.duckdns.org',
+]
 
 # Application definition
 

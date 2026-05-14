@@ -4,14 +4,22 @@ import atexit
 from psycopg_pool import ConnectionPool
 from nodes.llm import get_compiled_master_graph
 
-DB_URI = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+DB_URI = os.getenv('LANGGRAPH_DB_URI') or f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
 
 _pool = None
 
 def get_pool() -> ConnectionPool:
     global _pool
     if _pool is None:
-        _pool = ConnectionPool(conninfo=DB_URI, max_size=20, kwargs={"autocommit": True})
+        def _configure(conn):
+            conn.prepare_threshold = 0
+
+        _pool = ConnectionPool(
+            conninfo=DB_URI,
+            max_size=20,
+            kwargs={"autocommit": True},
+            configure=_configure,
+        )
         atexit.register(_pool.close)
     return _pool
 

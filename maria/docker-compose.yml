@@ -1,16 +1,14 @@
 services:
   db:
     image: postgres:15-alpine
-    container_name: postgres_db
+    container_name: postgres_langgraph
     restart: always
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: ${DB_USER:-usuario_sprint}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-password_segura}
-      POSTGRES_DB: ${DB_NAME:-sprint_db}
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: langgraph
+      POSTGRES_PASSWORD: langgraph123
+      POSTGRES_DB: langgraph
+    volumes:
+      - langgraph_data:/var/lib/postgresql/data
 
   web:
     build: .
@@ -22,18 +20,30 @@ services:
       python manage.py makemigrations && 
       python manage.py migrate && 
       python manage.py seed_techniques &&
-      python manage.py seed_user &&
-      python manage.py seed_demo_users && 
-      python manage.py setup_langgraph && 
-      python manage.py runserver 0.0.0.0:8000"
+      python manage.py seed_user && 
+      python manage.py seed_demo_users &&
+      python manage.py setup_langgraph &&
+      pip install gunicorn &&
+      gunicorn maria.wsgi:application --bind 0.0.0.0:8000 --workers 4 --timeout 300"
     volumes:
       - .:/app
-    ports:
-      - "8000:8000"
     env_file:
       - .env
     depends_on:
       - db
 
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - web
+
 volumes:
-  postgres_data:
+  langgraph_data:
+
