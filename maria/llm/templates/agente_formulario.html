@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Design Sprint - Agente{% endblock %}
+{% block title %}Design Thinking - Agente{% endblock %}
 
 {% block content %}
 <style>
@@ -375,6 +375,80 @@ h3 { font-size: 1.05rem; font-weight: 600; }
 .final-screen .final-icon { font-size: 3.5rem; margin-bottom: 16px; }
 .final-screen h2 { font-size: 2rem; margin-bottom: 10px; }
 .final-screen p { color: var(--text-muted); margin-bottom: 28px; }
+
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Wrap principal sin max-width */
+  #pantalla-contexto,
+  #pantalla-seleccion,
+  #pantalla-ejecucion,
+  #pantalla-final { max-width: 100%; }
+
+  /* Panel de formulario */
+  .panel { padding: 14px; }
+
+  /* Tech cards: 2 columnas en móvil */
+  .tech-grid {
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+    gap: 10px;
+  }
+
+  /* Cabecera de ejecución apilada */
+  .exec-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .exec-step { align-self: flex-end; }
+
+  /* Acciones en columna */
+  .exec-actions {
+    flex-direction: column;
+  }
+  .exec-actions button,
+  .exec-actions a {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Modales a pantalla completa en móvil */
+  .modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 16px 16px 0 0;
+    margin-top: auto;
+    margin-bottom: 0;
+  }
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  /* Selector de idioma en columna */
+  #pantalla-contexto > div:last-child {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  #pantalla-contexto > div:last-child > div {
+    justify-content: space-between;
+  }
+  #pantalla-contexto > div:last-child button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Timeline ocupa todo el ancho */
+  .timeline-wrap { min-height: 100px; }
+
+  /* H1 más pequeño */
+  h1 { font-size: 1.3rem !important; }
+}
+
+@media (max-width: 480px) {
+  .tech-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
 </style>
 
 <!-- Loading overlay -->
@@ -499,7 +573,7 @@ h3 { font-size: 1.05rem; font-weight: 600; }
 <!-- PANTALLA 0: CONTEXTO DEL PROBLEMA                        -->
 <!-- ======================================================== -->
 <div id="pantalla-contexto">
-  <h1>Design Sprint con IA</h1>
+  <h1>Design Thinking con IA</h1>
   <p class="subtitle">Define el contexto del problema antes de seleccionar las técnicas.</p>
 
   <div class="panel">
@@ -525,7 +599,18 @@ h3 { font-size: 1.05rem; font-weight: 600; }
     </div>
   </div>
 
-  <div style="display:flex; justify-content:flex-end;">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px; flex-wrap:wrap; gap:12px;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <label for="inp-language" style="font-size:13px; font-weight:600; color:var(--text-secondary); white-space:nowrap;">🌐 Idioma de respuesta</label>
+      <select id="inp-language" style="padding:8px 12px; border:1.5px solid var(--border); border-radius:8px; font-size:13px; font-family:inherit; background:#fff; cursor:pointer;">
+        <option value="español">🇪🇸 Español</option>
+        <option value="english">🇬🇧 English</option>
+        <option value="français">🇫🇷 Français</option>
+        <option value="deutsch">🇩🇪 Deutsch</option>
+        <option value="português">🇵🇹 Português</option>
+        <option value="italiano">🇮🇹 Italiano</option>
+      </select>
+    </div>
     <button class="btn btn-primary" onclick="irASeleccion()">
       Seleccionar técnicas →
     </button>
@@ -1029,6 +1114,7 @@ function iniciarSprint() {
   fd.append('usuario',   document.getElementById('inp-usuario').value);
   fd.append('dolores',   document.getElementById('inp-dolores').value);
   fd.append('idea',      document.getElementById('inp-idea').value);
+  fd.append('language',                (document.getElementById('inp-language').value.trim() || 'español'));
   fd.append('selected_techniques',     JSON.stringify(selectedIds));
   fd.append('technique_prompts',       JSON.stringify(techniquePrompts));
   fd.append('technique_llm_providers', JSON.stringify(techniqueLlmProviders));
@@ -1235,6 +1321,14 @@ function renderPreInputs(techId) {
       input = document.createElement('input');
       input.type = q.type;
       input.placeholder = q.placeholder || '';
+      if (q.type === 'number') {
+        input.min = '1';
+        input.step = '1';
+        input.addEventListener('input', () => {
+          const v = parseInt(input.value, 10);
+          if (!isNaN(v) && v < 1) input.value = '1';
+        });
+      }
     }
     input.id = `pre-input-${q.id}`;
     group.appendChild(input);
@@ -1248,10 +1342,20 @@ function enviarPreInputs(skip) {
   const extra     = {};
 
   if (!skip) {
-    questions.forEach(q => {
+    for (const q of questions) {
       const el = document.getElementById(`pre-input-${q.id}`);
-      if (el && el.value.trim()) extra[q.id] = el.value.trim();
-    });
+      if (!el || !el.value.trim()) continue;
+      if (q.type === 'number') {
+        const v = parseInt(el.value, 10);
+        if (isNaN(v) || v < 1) {
+          alert(`El campo "${q.label}" debe ser un número mayor que 0.`);
+          return;
+        }
+        extra[q.id] = String(v);
+      } else {
+        extra[q.id] = el.value.trim();
+      }
+    }
   }
 
   const fd = new FormData();

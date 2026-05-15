@@ -1,6 +1,7 @@
 import sys
 import os
 import json
+import time
 from langgraph.checkpoint.postgres import PostgresSaver
 from psycopg_pool import ConnectionPool
 from langgraph.graph import StateGraph, END
@@ -98,6 +99,41 @@ def _build_context_str(technique_outputs: dict) -> str:
     return "\n\n".join(parts)
 
 
+_QUOTA_KEYWORDS = [
+    '429', 'rate limit', 'quota', 'resource exhausted', 'resourceexhausted',
+    'too many requests', 'exhausted', 'rate_limit_exceeded',
+]
+_AUTH_KEYWORDS = ['401', 'unauthorized', 'invalid api key', 'authentication', 'api key']
+
+
+def _classify_llm_error(e: Exception) -> str:
+    s = str(e).lower()
+    if any(k in s for k in _QUOTA_KEYWORDS):
+        return 'quota_exceeded'
+    if any(k in s for k in _AUTH_KEYWORDS):
+        return 'auth_error'
+    return 'unknown_error'
+
+
+def _invoke_with_retry(llm_instance, prompt, max_retries: int = 3):
+    """Invoke LLM with exponential backoff on quota/rate-limit errors."""
+    for attempt in range(max_retries):
+        try:
+            return llm_instance.invoke(prompt)
+        except Exception as e:
+            if _classify_llm_error(e) == 'quota_exceeded' and attempt < max_retries - 1:
+                wait = 2 ** (attempt + 1)
+                print(f"⏳ Quota/rate-limit (intento {attempt + 1}/{max_retries}), reintentando en {wait}s…")
+                time.sleep(wait)
+                continue
+            raise
+
+
+def _language_instruction(state: MasterState) -> str:
+    lang = (state.get("language") or "español").strip()
+    return f"\n\nIDIOMA: Escribe todo el contenido textual de la respuesta en {lang}. Mantén las claves JSON en inglés o español técnico."
+
+
 def _run_generic_llm(state: MasterState, prompt_template: str, custom_prompt: str | None, extra_inputs: dict | None = None, llm_instance=None) -> dict:
     """Run a technique using a prompt template + generic LLM call."""
     _llm = llm_instance or llm
@@ -115,7 +151,8 @@ def _run_generic_llm(state: MasterState, prompt_template: str, custom_prompt: st
     feedback = state.get("user_feedback", "")
     if feedback:
         prompt += f"\n\nFeedback de revisión (mejora tu respuesta anterior basándote en esto):\n{feedback}"
-    response = _llm.invoke(prompt)
+    prompt += _language_instruction(state)
+    response = _invoke_with_retry(_llm, prompt)
     try:
         return json.loads(response.content)
     except json.JSONDecodeError:
@@ -143,6 +180,7 @@ def _run_ltg(state: MasterState, custom_prompt: str | None, extra_inputs: dict |
     }
     if custom_prompt:
         inputs["_custom_prompt"] = custom_prompt
+    inputs["_language_instruction"] = _language_instruction(state)
     app = _get_subgraph(build_ltg_subgraph, llm_instance or llm)
     result = app.invoke(inputs)
     return result.get("ltg_analysis", {})
@@ -157,11 +195,12 @@ def _run_sq(state: MasterState, custom_prompt: str | None, extra_inputs: dict | 
     if feedback:
         preferred = (preferred + f"\n\nFeedback de revisión: {feedback}").strip()
     inputs = {
-        "problem_definition": state.get("problem_definition", ""),
-        "ltg_analysis":       prev.get("ltg", {}),
-        "prefered_goal":      preferred,
-        "initial_idea":       state.get("initial_idea", ""),
+        "problem_definition":    state.get("problem_definition", ""),
+        "ltg_analysis":          prev.get("ltg", {}),
+        "prefered_goal":         preferred,
+        "initial_idea":          state.get("initial_idea", ""),
         "retries": 0, "validated": False,
+        "_language_instruction": _language_instruction(state),
     }
     app = _get_subgraph(build_sq_subgraph, llm_instance or llm)
     result = app.invoke(inputs)
@@ -221,7 +260,8 @@ def _run_hmw(state: MasterState, custom_prompt: str | None, extra_inputs: dict |
     feedback = state.get("user_feedback", "")
     if feedback:
         prompt += f"\n\nFeedback de revisión (mejora tu respuesta anterior basándote en esto):\n{feedback}"
-    response = _llm.invoke(prompt)
+    prompt += _language_instruction(state)
+    response = _invoke_with_retry(_llm, prompt)
     try:
         return json.loads(response.content)
     except json.JSONDecodeError:
@@ -290,7 +330,6 @@ def run_technique(state: MasterState) -> dict:
     custom     = prompts.get(tech_id)
     extra      = state.get("technique_extra_inputs", {}).get(tech_id)
 
-    # Build LLM for this technique
     providers  = state.get("technique_llm_providers") or {}
     api_keys   = state.get("user_api_keys") or {}
     provider   = providers.get(tech_id, "google")
@@ -298,19 +337,50 @@ def run_technique(state: MasterState) -> dict:
     tech_llm   = build_llm(provider, api_key)
 
     runner = TECHNIQUE_REGISTRY.get(tech_id)
-    print(f"🚀 Ejecutando técnica [{idx + 1}/{len(techniques)}]: {tech_id} (LLM: {provider})")
-    try:
+
+    def _run_with(llm_instance):
         if runner is not None:
-            output = runner(state, custom, extra, tech_llm)
-        elif custom:
-            # Custom DB technique: prompt already loaded into technique_prompts by services.py
-            output = _run_generic_llm(state, custom, None, extra, tech_llm)
-        else:
-            print(f"⚠️  Técnica desconocida y sin prompt: {tech_id}")
-            output = {"error": f"Técnica '{tech_id}' no reconocida."}
-    except Exception as e:
-        print(f"❌ Error en técnica {tech_id} (LLM: {provider}): {e}")
-        output = {"llm_error": True, "provider": provider, "message": str(e)}
+            return runner(state, custom, extra, llm_instance)
+        if custom:
+            return _run_generic_llm(state, custom, None, extra, llm_instance)
+        return None
+
+    api_keys = state.get("user_api_keys") or {}
+    fallback_providers = [p for p in ("openai", "anthropic", "google") if p != provider and api_keys.get(p)]
+    fallback_providers.append("google")  # system key as last resort
+    candidates = [(provider, api_key)] + [(p, api_keys.get(p)) for p in fallback_providers]
+    seen = set()
+    candidates = [(p, k) for p, k in candidates if not (p in seen or seen.add(p))]
+
+    print(f"🚀 Ejecutando técnica [{idx + 1}/{len(techniques)}]: {tech_id} (LLM: {provider})")
+    output = None
+    last_error = None
+    for attempt_provider, attempt_key in candidates:
+        attempt_llm = build_llm(attempt_provider, attempt_key)
+        try:
+            result = _run_with(attempt_llm)
+            if result is None:
+                print(f"⚠️  Técnica desconocida y sin prompt: {tech_id}")
+                output = {"error": f"Técnica '{tech_id}' no reconocida."}
+            else:
+                if attempt_provider != provider:
+                    print(f"✅ Fallback exitoso a {attempt_provider} para técnica {tech_id}")
+                output = result
+            break
+        except Exception as e:
+            error_type = _classify_llm_error(e)
+            print(f"❌ Error en técnica {tech_id} (LLM: {attempt_provider}, tipo: {error_type}): {e}")
+            last_error = (attempt_provider, error_type, e)
+            if error_type != 'quota_exceeded':
+                break  # non-quota errors don't benefit from switching provider
+
+    if output is None and last_error:
+        attempt_provider, error_type, e = last_error
+        user_msg = {
+            'quota_exceeded': "Todos los proveedores LLM disponibles han agotado su cuota. Espera unos minutos e inténtalo de nuevo.",
+            'auth_error':     f"Clave API de {attempt_provider} inválida o sin permisos. Revisa tu perfil.",
+        }.get(error_type, f"Error inesperado con {attempt_provider}: {e}")
+        output = {"llm_error": True, "provider": attempt_provider, "error_type": error_type, "message": user_msg}
     print(f"✅ Técnica completada: {tech_id}")
 
     outputs = dict(state.get("technique_outputs", {}))

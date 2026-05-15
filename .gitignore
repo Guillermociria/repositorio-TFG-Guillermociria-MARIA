@@ -2,9 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+*.pyc
 *.so
-
+000*
+CLAUDE.md
 
 .venv/
 venv/
@@ -29,6 +30,9 @@ share/python-wheels/
 
 *.sqlite3
 *.db
+
+docker-compose.override.yml
+docker-compose.local.yml
 
 media/
 

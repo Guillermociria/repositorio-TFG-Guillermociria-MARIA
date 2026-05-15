@@ -66,6 +66,7 @@ def sprint_view(request, session_id):
                     "current_technique_index": 0,
                     "technique_outputs":       {},
                     "technique_extra_inputs":  {},
+                    "language":                request.POST.get("language", "español"),
                     "is_approved":             False,
                     "user_feedback":           "",
                 }
@@ -168,6 +169,14 @@ def technique_create(request):
     if not isinstance(questionnaire, list):
         questionnaire = []
 
+    JSON_SUFFIX = (
+        "\n\nOUTPUT FORMAT: Devuelve ÚNICAMENTE un objeto JSON válido, sin markdown, "
+        "sin bloques de código, sin texto adicional antes ni después. "
+        "El JSON debe ser parseable directamente con JSON.parse()."
+    )
+    if "OUTPUT FORMAT" not in prompt and "json" not in prompt.lower():
+        prompt = prompt + JSON_SUFFIX
+
     tech = Technique.objects.create(
         tech_id             = tech_id,
         name                = name,
@@ -186,10 +195,13 @@ def technique_create(request):
 def technique_delete(request, tech_id):
     if not request.user.is_staff:
         return JsonResponse({"error": "Solo los administradores pueden eliminar técnicas."}, status=403)
-    deleted, _ = Technique.objects.filter(tech_id=tech_id).delete()
-    if deleted:
-        return JsonResponse({"ok": True})
-    return JsonResponse({"error": "No encontrada"}, status=404)
+    tech = Technique.objects.filter(tech_id=tech_id).first()
+    if not tech:
+        return JsonResponse({"error": "No encontrada"}, status=404)
+    if tech.is_builtin:
+        return JsonResponse({"error": "No se pueden eliminar técnicas builtin del sistema."}, status=403)
+    tech.delete()
+    return JsonResponse({"ok": True})
 
 
 # ── Technique Simulate ───────────────────────────────────────────────────────
@@ -225,7 +237,8 @@ def technique_simulate(request, tech_id):
             f"OUTPUT FORMAT: Devuelve SOLO JSON válido. Sin markdown. "
             f"Usa claves descriptivas para cada respuesta simulada."
         )
-        response = llm_instance.invoke(prompt)
+        from nodes.llm import _invoke_with_retry
+        response = _invoke_with_retry(llm_instance, prompt)
         try:
             result = json.loads(response.content)
         except (json.JSONDecodeError, ValueError):
@@ -241,6 +254,12 @@ def technique_simulate(request, tech_id):
 def export_session(request, session_id):
     session = get_object_or_404(SprintSession, pk=session_id, user=request.user)
     state   = get_session_state(str(session.thread_id))
+
+    if not state or not state.get("all_outputs"):
+        return JsonResponse(
+            {"error": "Se requiere al menos una técnica cerrada para generar el archivo."},
+            status=400,
+        )
 
     export = {
         "session": {

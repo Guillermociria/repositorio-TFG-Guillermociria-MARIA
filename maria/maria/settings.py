@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,7 +27,7 @@ SECRET_KEY = 'django-insecure-ltudau&u&7wx6*pav&q)yy=l@3ncys+9&%i=w1+l%2q1q0($=h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['mariaTFGdemo.duckdns.org']
+ALLOWED_HOSTS = ['mariatfgdemo.duckdns.org', '172.199.176.179', 'localhost', '127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = [
 	'https://mariatfgdemo.duckdns.org',
@@ -84,16 +85,24 @@ WSGI_APPLICATION = 'maria.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME':     os.getenv('DB_NAME'),
-        'USER':     os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST':     os.getenv('DB_HOST'),
-        'PORT':     os.getenv('DB_PORT', '5432'),
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'test_db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME':     os.getenv('DB_NAME'),
+            'USER':     os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'HOST':     os.getenv('DB_HOST'),
+            'PORT':     os.getenv('DB_PORT', '5432'),
+        }
+    }
 
 
 # Password validation

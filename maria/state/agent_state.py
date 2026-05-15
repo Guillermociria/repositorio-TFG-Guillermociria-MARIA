@@ -64,28 +64,23 @@ class GMState(TypedDict):
 # ==========================================
 
 class MasterState(TypedDict):
-    # Contexto base del problema
     problem_definition: str
     target_user: str
     pain_points: str
     initial_idea: str
 
-    # Pipeline configurado por el usuario
-    selected_techniques: List[str]   # IDs ordenados: ["ltg", "hmw", "brainstorming"]
-    technique_prompts: dict          # technique_id -> prompt personalizado (opcional)
-    current_technique_index: int     # índice de la técnica en ejecución
+    selected_techniques: List[str]   
+    technique_prompts: dict        
+    current_technique_index: int     
 
-    # Outputs acumulados. Al ejecutar la técnica N, las claves 0..N-1
-    # ya están aquí y se pasan como contexto adicional.
-    technique_outputs: dict          # {"ltg": {...}, "hmw": {...}, ...}
+    technique_outputs: dict        
 
-    # Inputs adicionales por técnica (cuestionario previo)
-    technique_extra_inputs: dict   # {"ltg": {"focus": "..."}, ...}
+    technique_extra_inputs: dict 
 
-    # LLM selection per technique
-    technique_llm_providers: dict  # {"ltg": "google", "hmw": "openai", ...}
-    user_api_keys: dict            # {"google": "...", "openai": "...", "anthropic": "..."}
+    technique_llm_providers: dict
+    user_api_keys: dict
 
-    # Control HITL
+    language: str 
+
     is_approved: bool
     user_feedback: str

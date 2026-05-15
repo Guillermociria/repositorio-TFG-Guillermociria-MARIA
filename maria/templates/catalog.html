@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Catálogo de técnicas{% endblock %}
+{% block header_title %}Catálogo de técnicas{% endblock %}
+{% block nav_catalog %}active{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -142,6 +144,15 @@ code { font-family: monospace; font-size: 0.85em; background: #f3f4f4; padding: 
     padding: 40px;
     color: #aaa;
     font-size: 14px;
+}
+@media (max-width: 768px) {
+    .tech-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .catalog-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .modal { width: 100% !important; max-width: 100% !important; border-radius: 16px 16px 0 0; margin-top: auto; }
+    .modal-overlay { align-items: flex-end; padding: 0; }
+}
+@media (max-width: 480px) {
+    .tech-grid { grid-template-columns: 1fr; }
 }
 </style>
 {% endblock %}

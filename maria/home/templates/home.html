@@ -1,22 +1,105 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}MARIA — Design Thinking AI{% endblock %}
+{% block header_title %}Inicio{% endblock %}
+{% block nav_home %}active{% endblock %}
 
-{% block content %}
-
-<h2>Dashboard</h2>
-<br>
-
-<button class="btn" id="btn">Click</button>
-
+{% block extra_css %}
+<style>
+.home-hero {
+    max-width: 720px;
+}
+.home-hero h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 10px;
+}
+.home-hero .subtitle {
+    font-size: 15px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    font-weight: 500;
+}
+.home-hero p {
+    font-size: 15px;
+    color: #444;
+    line-height: 1.75;
+    margin-bottom: 18px;
+}
+.stages-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 28px 0 32px;
+}
+.stage-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 50px;
+    background: var(--secondary);
+    border: 1.5px solid var(--border);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dark);
+}
+.home-cta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.btn-outline {
+    background: none;
+    border: 1.5px solid var(--primary);
+    color: var(--primary);
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.btn-outline:hover {
+    background: var(--primary);
+    color: white;
+}
+</style>
 {% endblock %}
 
-{% block scripts %}
+{% block content %}
+<div class="home-hero">
+    <h2>Bienvenido a MARIA</h2>
+    <p class="subtitle">Tu asistente de Inteligencia Artificial para procesos de Design Thinking</p>
 
-<script>
-document.getElementById("btn").onclick=function(){
-    alert("Funciona!");
-}
-</script>
+    <p>
+        El <strong>Design Thinking</strong> es una metodología de innovación centrada en las personas que permite abordar problemas complejos de forma creativa y estructurada. Surgida en los años 60 y popularizada por IDEO y la Universidad de Stanford, combina empatía, creatividad y racionalidad para generar soluciones que realmente importen a los usuarios.
+    </p>
+    <p>
+        El proceso se articula en cinco fases iterativas: primero <strong>empatizar</strong> con el usuario para comprender sus necesidades reales; luego <strong>definir</strong> el problema concreto a resolver; a continuación <strong>idear</strong> soluciones de forma divergente; después <strong>prototipar</strong> versiones rápidas y tangibles; y finalmente <strong>testear</strong> con usuarios reales para aprender y mejorar.
+    </p>
+    <p>
+        MARIA te acompaña en cada una de estas fases aplicando modelos de lenguaje avanzados. Puedes ejecutar técnicas como el <em>Mapa de Empatía</em>, <em>Long Term Goal</em>, <em>HMW</em>, <em>Brainstorming</em> o <em>Customer Journey Map</em>, obtener resultados estructurados, corregirlos con retroalimentación y simular respuestas de usuarios reales.
+    </p>
 
+    <div class="stages-row">
+        <span class="stage-pill">🔍 Empatizar</span>
+        <span class="stage-pill">🎯 Definir</span>
+        <span class="stage-pill">💡 Idear</span>
+        <span class="stage-pill">🛠️ Prototipar</span>
+        <span class="stage-pill">🧪 Testear</span>
+    </div>
+
+    <div class="home-cta">
+        <a class="btn" href="{% url 'dashboard' %}">Ir a mis sesiones</a>
+        <a class="btn-outline" href="{% url 'catalog' %}">Ver catálogo de técnicas</a>
+    </div>
+</div>
 {% endblock %}
