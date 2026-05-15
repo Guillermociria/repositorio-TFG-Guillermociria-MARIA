@@ -1,0 +1,58 @@
+services:
+  db_django:
+    image: postgres:15-alpine
+    container_name: postgres_django_local
+    restart: always
+    environment:
+      POSTGRES_USER: django
+      POSTGRES_PASSWORD: django123
+      POSTGRES_DB: sprint_db
+    volumes:
+      - django_data:/var/lib/postgresql/data
+
+  db:
+    image: postgres:15-alpine
+    container_name: postgres_langgraph
+    restart: always
+    environment:
+      POSTGRES_USER: langgraph
+      POSTGRES_PASSWORD: langgraph123
+      POSTGRES_DB: langgraph
+    volumes:
+      - langgraph_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: django_web
+    working_dir: /app
+    ports:
+      - "8000:8000"
+    command: >
+      bash -c "pip install --upgrade pip &&
+      pip install -r requirements.txt &&
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py seed_techniques &&
+      python manage.py seed_user &&
+      python manage.py seed_demo_users &&
+      python manage.py setup_langgraph &&
+      pip install gunicorn &&
+      gunicorn maria.wsgi:application --bind 0.0.0.0:8000 --workers 4 --timeout 300"
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db_django
+      DB_PORT: "5432"
+      DB_USER: django
+      DB_PASSWORD: django123
+      DB_NAME: sprint_db
+      LANGGRAPH_DB_URI: postgresql://langgraph:langgraph123@db:5432/langgraph
+    depends_on:
+      - db_django
+      - db
+
+volumes:
+  django_data:
+  langgraph_data:

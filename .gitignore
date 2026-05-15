@@ -32,7 +32,6 @@ share/python-wheels/
 *.db
 
 docker-compose.override.yml
-docker-compose.local.yml
 
 media/
 
