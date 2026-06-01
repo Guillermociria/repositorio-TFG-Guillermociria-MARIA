@@ -123,7 +123,7 @@ def _invoke_with_retry(llm_instance, prompt, max_retries: int = 3):
         except Exception as e:
             if _classify_llm_error(e) == 'quota_exceeded' and attempt < max_retries - 1:
                 wait = 2 ** (attempt + 1)
-                print(f"⏳ Quota/rate-limit (intento {attempt + 1}/{max_retries}), reintentando en {wait}s…")
+                print(f"Quota/rate-limit (intento {attempt + 1}/{max_retries}), reintentando en {wait}s…")
                 time.sleep(wait)
                 continue
             raise
@@ -352,7 +352,7 @@ def run_technique(state: MasterState) -> dict:
     seen = set()
     candidates = [(p, k) for p, k in candidates if not (p in seen or seen.add(p))]
 
-    print(f"🚀 Ejecutando técnica [{idx + 1}/{len(techniques)}]: {tech_id} (LLM: {provider})")
+    print(f"Ejecutando técnica [{idx + 1}/{len(techniques)}]: {tech_id} (LLM: {provider})")
     output = None
     last_error = None
     for attempt_provider, attempt_key in candidates:
@@ -360,16 +360,16 @@ def run_technique(state: MasterState) -> dict:
         try:
             result = _run_with(attempt_llm)
             if result is None:
-                print(f"⚠️  Técnica desconocida y sin prompt: {tech_id}")
+                print(f"Técnica desconocida y sin prompt: {tech_id}")
                 output = {"error": f"Técnica '{tech_id}' no reconocida."}
             else:
                 if attempt_provider != provider:
-                    print(f"✅ Fallback exitoso a {attempt_provider} para técnica {tech_id}")
+                    print(f"Fallback exitoso a {attempt_provider} para técnica {tech_id}")
                 output = result
             break
         except Exception as e:
             error_type = _classify_llm_error(e)
-            print(f"❌ Error en técnica {tech_id} (LLM: {attempt_provider}, tipo: {error_type}): {e}")
+            print(f"Error en técnica {tech_id} (LLM: {attempt_provider}, tipo: {error_type}): {e}")
             last_error = (attempt_provider, error_type, e)
             if error_type != 'quota_exceeded':
                 break  # non-quota errors don't benefit from switching provider
