@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(Test-Path \"c:\\\\Users\\\\G\\\\Desktop\\\\Uni\\\\TFG\\\\RepoTFG\\\\maria\\\\nginx.conf\")"
-    ]
-  }
-}

@@ -10,10 +10,9 @@ Ejecución (desde la raíz del repo):
 
 Requiere: servidor Django corriendo en BASE_URL (por defecto localhost:8000).
 Crear usuario de test con:
-    python maria/manage.py shell -c "
-        from user.models import User
-        User.objects.create_user('pw_test', 'pw@test.com', 'PwPass123!')
-    "
+    python maria/manage.py seed_tests
+
+Variables de entorno: DJANGO_BASE_URL, PW_TEST_USER, PW_TEST_PASS.
 """
 import os
 import pytest

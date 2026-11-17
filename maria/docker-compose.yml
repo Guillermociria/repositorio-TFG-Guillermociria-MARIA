@@ -1,12 +1,15 @@
+# Server deployment: Django + Gunicorn behind an nginx reverse proxy with TLS.
+# Requires an nginx config (NGINX_CONF, default ./nginx.conf) and certificates (CERTS_DIR).
+# For local use, prefer docker-compose.local.yml.
 services:
   db:
     image: postgres:15-alpine
     container_name: postgres_langgraph
     restart: always
     environment:
-      POSTGRES_USER: langgraph
-      POSTGRES_PASSWORD: langgraph123
-      POSTGRES_DB: langgraph
+      POSTGRES_USER: ${DB_USER:-langgraph}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-langgraph123}
+      POSTGRES_DB: ${DB_NAME:-langgraph}
     volumes:
       - langgraph_data:/var/lib/postgresql/data
 
@@ -15,12 +18,12 @@ services:
     container_name: django_web
     working_dir: /app
     command: >
-      bash -c "pip install --upgrade pip && 
-      pip install -r requirements.txt && 
-      python manage.py makemigrations && 
-      python manage.py migrate && 
+      bash -c "pip install --upgrade pip &&
+      pip install -r requirements.txt &&
+      python manage.py makemigrations &&
+      python manage.py migrate &&
       python manage.py seed_techniques &&
-      python manage.py seed_user && 
+      python manage.py seed_user &&
       python manage.py seed_demo_users &&
       python manage.py setup_langgraph &&
       pip install gunicorn &&
@@ -29,6 +32,12 @@ services:
       - .:/app
     env_file:
       - .env
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-langgraph}
+      DB_PASSWORD: ${DB_PASSWORD:-langgraph123}
+      DB_NAME: ${DB_NAME:-langgraph}
     depends_on:
       - db
 
@@ -39,11 +48,10 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ${NGINX_CONF:-./nginx.conf}:/etc/nginx/conf.d/default.conf
+      - ${CERTS_DIR:-/etc/letsencrypt}:/etc/letsencrypt:ro
     depends_on:
       - web
 
 volumes:
   langgraph_data:
-

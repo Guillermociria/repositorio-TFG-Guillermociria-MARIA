@@ -1,10 +1,13 @@
+import os
 from django.core.management.base import BaseCommand
 from user.models import User
 
 
 TEST_USERS = [
-    {'username': 'test_perf',  'email': 'perf@test.com', 'password': 'PerfPass123!'},
-    {'username': 'pw_test',    'email': 'pw@test.com',   'password': 'PwPass123!'},
+    {'username': os.getenv('PERF_TEST_USER', 'test_perf'), 'email': 'perf@test.com',
+     'password': os.getenv('PERF_TEST_PASS', 'PerfPass123!')},
+    {'username': os.getenv('PW_TEST_USER', 'pw_test'), 'email': 'pw@test.com',
+     'password': os.getenv('PW_TEST_PASS', 'PwPass123!')},
 ]
 
 

@@ -1,17 +1,18 @@
+import os
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
 DEMO_USER = {
-    'username': 'demo',
+    'username': os.getenv('DEMO_USER', 'demo'),
     'email':    'demo@example.com',
-    'password': 'demo1234',
+    'password': os.getenv('DEMO_PASSWORD', 'demo1234'),
 }
 
 
 class Command(BaseCommand):
-    help = 'Crea un usuario de prueba (demo/demo1234)'
+    help = 'Crea un usuario de prueba (DEMO_USER / DEMO_PASSWORD, por defecto demo/demo1234)'
 
     def handle(self, *args, **kwargs):
         user, created = User.objects.get_or_create(

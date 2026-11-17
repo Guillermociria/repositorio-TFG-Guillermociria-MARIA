@@ -2,11 +2,14 @@
 Pruebas de interfaz con Playwright.
 Ejecutar contra un servidor Django en marcha (ver conftest.py).
 """
+import os
 import re
 import pytest
 from playwright.sync_api import expect
 
-BASE_URL = 'http://localhost:8000'
+BASE_URL  = os.getenv('DJANGO_BASE_URL', 'http://localhost:8000')
+TEST_USER = os.getenv('PW_TEST_USER', 'pw_test')
+TEST_PASS = os.getenv('PW_TEST_PASS', 'PwPass123!')
 
 
 # ── RF-01: Login ─────────────────────────────────────────────────────────────
@@ -16,15 +19,15 @@ class TestRF01LoginUI:
 
     def test_positive_valid_login_redirects_to_dashboard(self, page):
         page.goto(f'{BASE_URL}/user/login/')
-        page.fill('input[name="username"]', 'pw_test')
-        page.fill('input[name="password"]', 'PwPass123!')
+        page.fill('input[name="username"]', TEST_USER)
+        page.fill('input[name="password"]', TEST_PASS)
         page.click('button[type="submit"]')
         page.wait_for_url(f'{BASE_URL}/dashboard/')
         expect(page).to_have_url(re.compile(r'.*/dashboard/'))
 
     def test_negative_wrong_password_shows_error(self, page):
         page.goto(f'{BASE_URL}/user/login/')
-        page.fill('input[name="username"]', 'pw_test')
+        page.fill('input[name="username"]', TEST_USER)
         page.fill('input[name="password"]', 'WrongPass')
         page.click('button[type="submit"]')
         # Debe permanecer en login

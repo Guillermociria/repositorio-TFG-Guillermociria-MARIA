@@ -4,9 +4,9 @@ services:
     container_name: postgres_django_local
     restart: always
     environment:
-      POSTGRES_USER: django
-      POSTGRES_PASSWORD: django123
-      POSTGRES_DB: sprint_db
+      POSTGRES_USER: ${DB_USER:-django}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-django123}
+      POSTGRES_DB: ${DB_NAME:-sprint_db}
     volumes:
       - django_data:/var/lib/postgresql/data
 
@@ -15,9 +15,9 @@ services:
     container_name: postgres_langgraph
     restart: always
     environment:
-      POSTGRES_USER: langgraph
-      POSTGRES_PASSWORD: langgraph123
-      POSTGRES_DB: langgraph
+      POSTGRES_USER: ${LANGGRAPH_DB_USER:-langgraph}
+      POSTGRES_PASSWORD: ${LANGGRAPH_DB_PASSWORD:-langgraph123}
+      POSTGRES_DB: ${LANGGRAPH_DB_NAME:-langgraph}
     volumes:
       - langgraph_data:/var/lib/postgresql/data
 
@@ -26,7 +26,7 @@ services:
     container_name: django_web
     working_dir: /app
     ports:
-      - "8000:8000"
+      - "${WEB_PORT:-8000}:8000"
     command: >
       bash -c "pip install --upgrade pip &&
       pip install -r requirements.txt &&
@@ -45,10 +45,10 @@ services:
     environment:
       DB_HOST: db_django
       DB_PORT: "5432"
-      DB_USER: django
-      DB_PASSWORD: django123
-      DB_NAME: sprint_db
-      LANGGRAPH_DB_URI: postgresql://langgraph:langgraph123@db:5432/langgraph
+      DB_USER: ${DB_USER:-django}
+      DB_PASSWORD: ${DB_PASSWORD:-django123}
+      DB_NAME: ${DB_NAME:-sprint_db}
+      LANGGRAPH_DB_URI: postgresql://${LANGGRAPH_DB_USER:-langgraph}:${LANGGRAPH_DB_PASSWORD:-langgraph123}@db:5432/${LANGGRAPH_DB_NAME:-langgraph}
     depends_on:
       - db_django
       - db

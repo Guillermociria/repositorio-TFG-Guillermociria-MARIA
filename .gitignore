@@ -61,3 +61,5 @@ coverage.xml
 .coverage
 .coverage.*
 htmlcov/
+# Local tooling
+.claude/

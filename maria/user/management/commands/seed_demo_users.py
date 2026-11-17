@@ -1,9 +1,10 @@
+import os
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-PASSWORD = 'demo123'
+PASSWORD = os.getenv('DEMO_USERS_PASSWORD', 'demo123')
 
 DEMO_USERS = [
     ('demo01', 'Ana García',       'ana.garcia@demo.com'),
@@ -45,7 +46,7 @@ DEMO_USERS = [
 
 
 class Command(BaseCommand):
-    help = 'Crea 35 usuarios demo con contraseña demo123'
+    help = 'Crea 35 usuarios demo (contraseña DEMO_USERS_PASSWORD, por defecto demo123)'
 
     def handle(self, *args, **kwargs):
         created_count = 0

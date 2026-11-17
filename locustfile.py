@@ -12,8 +12,12 @@ Requisito: servidor Django corriendo con usuario test_perf creado.
 Crear con: docker exec django_web python manage.py seed_tests
 """
 import json
+import os
 import random
 from locust import HttpUser, task, between
+
+PERF_USER = os.getenv('PERF_TEST_USER', 'test_perf')
+PERF_PASS = os.getenv('PERF_TEST_PASS', 'PerfPass123!')
 
 
 # ── Usuario base con autenticación y CSRF ────────────────────────────────────
@@ -28,8 +32,8 @@ class _AuthBase(HttpUser):
         self.client.post(
             '/user/login/',
             data={
-                'username': 'test_perf',
-                'password': 'PerfPass123!',
+                'username': PERF_USER,
+                'password': PERF_PASS,
                 'csrfmiddlewaretoken': csrf,
             },
             headers={'Referer': f'{self.host}/user/login/'},
